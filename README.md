@@ -5,12 +5,19 @@ Carbon Footprint Platform is a smart sustainability awareness platform designed 
 ## 🚀 Features
 
  🤖 Advanced AI Sustainability Advisor with conversation history
+ 
  📄 PDF Report Generation (downloadable personalised report)
+ 
  📅 Carbon Footprint History Tracking (localStorage persistence)
+ 
  ☀️ Renewable Energy Impact Calculator
+ 
  🌐 Community Sustainability Challenges & leaderboard
+ 
  📍 Region-specific emission factors (India state-level grid data)
+ 
  🎯 Monthly reduction goal setting with progress tracking
+ 
  🔔 Reminder notifications via PWA
 
 ## 🧮 How It Works
