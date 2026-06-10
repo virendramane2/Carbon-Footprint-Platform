@@ -48,7 +48,7 @@ html { font-size: var(--base-font-size); transition: font-size 0.2s; }
 .skip-link { position: absolute; top: -40px; left: 0; background: #1D9E75; color: white; padding: 8px; z-index: 1000; transition: top 0.2s; }
 .skip-link:focus { top: 0; }
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
-body { background: var(--color-background-primary); color: var(--color-text-primary); transition: background 0.3s, color 0.3s; }
+body { background: var(--color-background-primary); color: var(--color-text-primary); transition: background 0.3s, color 0.3s; top: 0 !important; position: static !important; }
 .app{font-family:var(--font-sans);padding-bottom:1rem; width: 100%; max-width: 1100px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column;}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:0.5px solid var(--color-border-tertiary); flex-wrap: wrap; gap: 10px;}
 .brand{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:500;color:var(--color-text-primary)}
@@ -63,13 +63,14 @@ body { background: var(--color-background-primary); color: var(--color-text-prim
 .live-pill{font-size:12px;padding:4px 12px;border-radius:20px;border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);background:var(--color-background-secondary)}
 .live-pill b{color:#0F6E56}
 
-/* GOOGLE TRANSLATE FIXES */
-#google_translate_element { overflow: hidden; border-radius: 6px; }
-.goog-te-combo { padding: 6px; border-radius: 6px; border: 1px solid var(--color-border-secondary); background: var(--color-background-secondary); color: var(--color-text-primary); font-family: var(--font-sans); font-size: 12px; outline: none; cursor: pointer; max-width: 140px; margin: 0 !important; }
-.goog-logo-link { display: none !important; }
-.goog-te-gadget { color: transparent !important; font-size: 0 !important; }
-.goog-te-banner-frame.skiptranslate { display: none !important; }
-body { top: 0px !important; position: static !important; }
+/* CUSTOM LANGUAGE PICKER */
+.lang-picker { display: flex; align-items: center; gap: 6px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: 6px; padding: 0 8px; height: 32px; }
+.lang-picker select { background: transparent; border: none; color: var(--color-text-primary); font-family: var(--font-sans); font-size: 12px; outline: none; cursor: pointer; padding: 4px 0; max-width: 120px;}
+.lang-picker i { color: var(--color-text-secondary); font-size: 16px; }
+
+/* HIDE DEFAULT GOOGLE TRANSLATE ARTIFACTS */
+.goog-te-banner-frame, .goog-te-balloon-frame, #goog-gt-tt, .goog-te-spinner-pos, .goog-logo-link { display: none !important; }
+.goog-text-highlight { background-color: transparent !important; box-shadow: none !important; }
 
 /* A11Y MENU */
 .a11y-menu {position: absolute; top: 55px; right: 18px; background: var(--color-background-primary); border: 1px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 10px; display: none; flex-direction: column; gap: 8px; z-index: 200;}
@@ -160,8 +161,6 @@ body { top: 0px !important; position: static !important; }
 /* COMMUNITY & GOALS */
 .history-item {display:flex; justify-content:space-between; padding:10px; border-bottom:0.5px solid var(--color-border-tertiary); font-size:12px;}
 .history-item:last-child {border-bottom:none;}
-.leader-row {display:flex; align-items:center; justify-content:space-between; padding:10px; border-radius:6px; margin-bottom:6px; background:var(--color-background-secondary);}
-.leader-row.me {background:#E1F5EE; border:1px solid #1D9E75;}
 .prog-bar {height:12px; background:var(--color-background-secondary); border-radius:6px; overflow:hidden; margin-top:8px;}
 .prog-fill {height:100%; background:#1D9E75; transition:width 0.5s;}
 
@@ -235,7 +234,28 @@ body { top: 0px !important; position: static !important; }
     CF Platform v3
   </div>
   <div class="topbar-actions">
-    <div id="google_translate_element"></div>
+    
+    <div class="lang-picker">
+      <i class="ti ti-language"></i>
+      <select id="lang-select" onchange="changeLanguage(this.value)">
+        <option value="en">English</option>
+        <option value="hi">हिंदी (Hindi)</option>
+        <option value="mr">मराठी (Marathi)</option>
+        <option value="bn">বাংলা (Bengali)</option>
+        <option value="te">తెలుగు (Telugu)</option>
+        <option value="ta">தமிழ் (Tamil)</option>
+        <option value="gu">ગુજરાતી (Gujarati)</option>
+        <option value="kn">ಕన్నడ (Kannada)</option>
+        <option value="ml">മലയാളം (Malayalam)</option>
+        <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+        <option value="ur">اردو (Urdu)</option>
+        <option value="or">ଓଡ଼ିଆ (Odia)</option>
+        <option value="as">অসমীয়া (Assamese)</option>
+        <option value="sa">संस्कृत (Sanskrit)</option>
+      </select>
+    </div>
+    <div id="google_translate_element" style="display:none;"></div>
+
     <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle Theme"><i class="ti ti-moon" id="theme-icon"></i></button>
     <div style="position: relative;">
       <button class="icon-btn" onclick="toggleA11yMenu()" aria-label="Accessibility Options" aria-expanded="false" id="a11y-btn"><i class="ti ti-accessible"></i></button>
@@ -401,14 +421,6 @@ body { top: 0px !important; position: static !important; }
     </div>
 
     <div class="card">
-      <div class="card-hd">🌐 Community Leaderboard</div>
-      <div style="font-size:12px; color:var(--color-text-secondary); margin-bottom:10px;">PromptWars Challenge 3 Top Reducers</div>
-      <div class="leader-row"><div style="font-weight:500;">1. Priya K.</div><div style="color:#0F6E56">2.1t</div></div>
-      <div class="leader-row"><div style="font-weight:500;">2. Rahul S.</div><div style="color:#0F6E56">2.4t</div></div>
-      <div class="leader-row me"><div style="font-weight:500;">3. You</div><div style="color:#0F6E56" id="lead-you">8.4t</div></div>
-      <div class="leader-row"><div style="font-weight:500;">4. Anita D.</div><div style="color:#0F6E56">9.2t</div></div>
-      
-      <hr style="border:none; border-top:0.5px solid var(--color-border-tertiary); margin:16px 0;">
       <div class="card-hd">🔔 Reminders (PWA)</div>
       <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
         <input type="checkbox" id="notify-tgl" onchange="toggleNotifications(this)"> Enable weekly check-in reminders
@@ -465,7 +477,7 @@ body { top: 0px !important; position: static !important; }
 </main>
 
 <div class="footer">
-  <div>Carbon Footprint Awareness Platform v3 &nbsp;&middot;&nbsp; Built for Hack2skill PromptWars Challenge 3 (By-ᐺᓰᖇᘿᘉᕲᖇᗩ ᘻᗩᘉᘿ)</div>
+  <div>Carbon Footprint Awareness Platform v3 &nbsp;&middot;&nbsp; Built for Hack2skill PromptWars Challenge 3</div>
   <div><span class="test-pill" id="test-status">Running Engine Tests...</span></div>
 </div>
 
@@ -476,7 +488,7 @@ body { top: 0px !important; position: static !important; }
     <button onclick="toggleChat()" aria-label="Close chat" style="background:none;border:none;color:white;cursor:pointer"><i class="ti ti-x"></i></button>
   </div>
   <div class="chat-body" id="chat-body" aria-live="polite">
-    <div class="msg ai">Hi Virendra! I am your AI Climate Adviser. How can I help you today?</div>
+    <div class="msg ai">Hi! I am your AI Climate Adviser. How can I help you today?</div>
   </div>
   <div class="chat-foot">
     <input type="text" id="chat-input" placeholder="Type a message..." aria-label="Message input" onkeypress="if(event.key==='Enter') sendChat()">
@@ -488,11 +500,23 @@ body { top: 0px !important; position: static !important; }
 
 <script type="text/javascript">
 function googleTranslateElementInit() {
-  new google.translate.TranslateElement({ 
-    pageLanguage: 'en', 
-    autoDisplay: false
-  }, 'google_translate_element');
+  new google.translate.TranslateElement({ pageLanguage: 'en', autoDisplay: false }, 'google_translate_element');
 }
+// Custom hook to trigger translation via native select
+function changeLanguage(langCode) {
+  document.cookie = `googtrans=/en/${langCode}; path=/;`;
+  document.cookie = `googtrans=/en/${langCode}; domain=${window.location.hostname}; path=/;`;
+  window.location.reload();
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const match = document.cookie.match(/googtrans=\/en\/([a-z]{2,3})/);
+  if(match && match[1]) {
+    const sel = document.getElementById('lang-select');
+    if(sel.querySelector(`option[value="${match[1]}"]`)) {
+      sel.value = match[1];
+    }
+  }
+});
 </script>
 <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
@@ -610,7 +634,6 @@ function updateDOM(){
 
   // Goals
   const gCurr = document.getElementById('g-curr'); if(gCurr) gCurr.textContent = t.toFixed(1) + 't';
-  const leadYou = document.getElementById('lead-you'); if(leadYou) leadYou.textContent = t.toFixed(1) + 't';
   updateGoalProgress(t);
 
   // Charts
