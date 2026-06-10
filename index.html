@@ -1,14 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carbon Footprint Platform</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 
 <style>
+/* CSS VARIABLES (Dynamic for Themes) */
+:root {
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f9fafb;
+  --color-text-primary: #111827;
+  --color-text-secondary: #4b5563;
+  --color-border-secondary: #d1d5db;
+  --color-border-tertiary: #e5e7eb;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --base-font-size: 100%;
+}
+
+:root.dark-theme {
+  --color-background-primary: #1f2937;
+  --color-background-secondary: #111827;
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #9ca3af;
+  --color-border-secondary: #4b5563;
+  --color-border-tertiary: #374151;
+}
+
+:root.high-contrast {
+  --color-background-primary: #000000 !important;
+  --color-background-secondary: #000000 !important;
+  --color-text-primary: #ffffff !important;
+  --color-text-secondary: #ffff00 !important;
+  --color-border-secondary: #ffffff !important;
+  --color-border-tertiary: #ffffff !important;
+}
+
+:root.large-text {
+  --base-font-size: 115%;
+}
+
+html { font-size: var(--base-font-size); transition: font-size 0.2s; }
+
 *{box-sizing:border-box;margin:0;padding:0}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
-.app{font-family:var(--font-sans);padding-bottom:2rem}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:0.5px solid var(--color-border-tertiary)}
+
+/* MAIN LAYOUT */
+body { background: var(--color-background-primary); color: var(--color-text-primary); transition: background 0.3s, color 0.3s; }
+.app{font-family:var(--font-sans);padding-bottom:1rem; width: 100%; max-width: 1100px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:0.5px solid var(--color-border-tertiary); flex-wrap: wrap; gap: 10px;}
 .brand{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:500;color:var(--color-text-primary)}
 .brand-mark{width:28px;height:28px;border-radius:7px;background:#1D9E75;display:flex;align-items:center;justify-content:center}
 .brand-mark i{font-size:15px;color:#fff}
+
+/* TOPBAR ACTIONS */
+.topbar-actions {display: flex; align-items: center; gap: 12px; flex-wrap: wrap;}
+.icon-btn {background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); width: 32px; height: 32px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: 0.2s;}
+.icon-btn:hover {background: var(--color-border-tertiary);}
 .live-pill{font-size:12px;padding:4px 12px;border-radius:20px;border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);background:var(--color-background-secondary)}
 .live-pill b{color:#0F6E56}
+
+/* GOOGLE TRANSLATE FIXES */
+#google_translate_element select { padding: 4px; border-radius: 4px; border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); color: var(--color-text-primary); font-family: var(--font-sans); font-size: 12px; outline: none;}
+.goog-te-gadget {font-family: var(--font-sans) !important; color: transparent !important;}
+.goog-te-gadget span {display: none;}
+.goog-te-banner-frame {display: none !important;}
+body {top: 0 !important;}
+
+/* ACCESSIBILITY MENU */
+.a11y-menu {position: absolute; top: 55px; right: 18px; background: var(--color-background-primary); border: 1px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 10px; display: none; flex-direction: column; gap: 8px; z-index: 200;}
+.a11y-menu.on {display: flex;}
+.a11y-menu button {background: var(--color-background-secondary); border: 1px solid var(--color-border-tertiary); color: var(--color-text-primary); padding: 8px 12px; border-radius: 4px; cursor: pointer; font-family: var(--font-sans); font-size: 12px; text-align: left; display: flex; align-items: center; gap: 8px;}
+.a11y-menu button:hover {background: var(--color-border-tertiary);}
+.a11y-menu button.active {border-color: #1D9E75; color: #1D9E75; background: #E1F5EE;}
 
 .tabs{display:flex;border-bottom:0.5px solid var(--color-border-tertiary);overflow-x:auto;background:var(--color-background-secondary)}
 .tab{flex-shrink:0;padding:10px 16px;font-size:12px;font-family:var(--font-sans);background:none;border:none;border-bottom:2px solid transparent;color:var(--color-text-secondary);cursor:pointer;white-space:nowrap;margin-bottom:-1px;display:flex;align-items:center;gap:5px}
@@ -16,21 +84,23 @@
 .tab.on{color:#0F6E56;border-bottom-color:#1D9E75;background:var(--color-background-primary);font-weight:500}
 .tab i{font-size:14px}
 
-.body{padding:16px 18px}
+.body{padding:16px 18px; flex: 1;}
 .pane{display:none}.pane.on{display:block}
 
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+/* GRIDS & CARDS */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:10px;margin-bottom:16px}
 .kpi{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px}
 .kpi-v{font-size:22px;font-weight:500;color:var(--color-text-primary);line-height:1.1}
 .kpi-l{font-size:11px;color:var(--color-text-secondary);margin-top:3px;text-transform:uppercase;letter-spacing:.06em}
 .kpi-d{font-size:11px;margin-top:3px}
 .kpi-d.bad{color:#993C1D}.kpi-d.good{color:#0F6E56}
 
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:12px;margin-bottom:16px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px; overflow: hidden;}
 .card-hd{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-secondary);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
 .card-hd-btn{font-size:11px;color:#1D9E75;background:none;border:none;cursor:pointer;font-family:var(--font-sans);font-weight:400;text-transform:none;letter-spacing:0}
 
+/* WIDGETS */
 .brow{display:flex;align-items:center;gap:10px;margin-bottom:8px;cursor:pointer}
 .brow:hover .blabel{color:var(--color-text-primary)}
 .blabel{font-size:12px;color:var(--color-text-secondary);width:76px;text-align:right;flex-shrink:0;transition:color .15s}
@@ -38,13 +108,13 @@
 .bfill{height:100%;border-radius:5px;transition:width .5s cubic-bezier(.4,0,.2,1)}
 .bval{font-size:11px;font-weight:500;color:var(--color-text-secondary);width:30px;text-align:right;flex-shrink:0}
 
-.ring-wrap{display:flex;align-items:center;gap:16px}
+.ring-wrap{display:flex;align-items:center;gap:16px; flex-wrap: wrap;}
 .ring-box{position:relative;width:100px;height:100px;flex-shrink:0}
 .ring-box svg{width:100px;height:100px}
 .ring-c{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
 .ring-n{font-size:22px;font-weight:500;color:var(--color-text-primary);line-height:1}
 .ring-u{font-size:10px;color:var(--color-text-secondary)}
-.ring-rows{flex:1;display:flex;flex-direction:column;gap:7px}
+.ring-rows{flex:1;display:flex;flex-direction:column;gap:7px; min-width: 180px;}
 .rrow{display:flex;justify-content:space-between;font-size:12px}
 .rrow-l{color:var(--color-text-secondary)}.rrow-v{font-weight:500;color:var(--color-text-primary)}
 .rrow-v.g{color:#0F6E56}.rrow-v.r{color:#993C1D}
@@ -68,7 +138,8 @@
 .src-body{display:none;padding:12px 14px;border-top:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
 .src-body.on{display:block}
 .src-desc{font-size:12px;color:var(--color-text-secondary);line-height:1.65;margin-bottom:10px}
-.src-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+
+.src-facts{display:grid;grid-template-columns:repeat(auto-fit, minmax(100px, 1fr));gap:8px;margin-bottom:10px}
 .fact{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:9px;text-align:center}
 .fact-v{font-size:15px;font-weight:500;color:var(--color-text-primary)}
 .fact-l{font-size:10px;color:var(--color-text-secondary);margin-top:2px;text-transform:uppercase;letter-spacing:.05em}
@@ -94,7 +165,7 @@
 .tthumb{position:absolute;width:16px;height:16px;border-radius:50%;background:var(--color-background-primary);top:3px;left:3px;transition:left .2s;pointer-events:none}
 .tgl input:checked~.tthumb{left:21px}
 
-.sav-box{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:14px 16px;margin-top:14px;display:flex;align-items:center;justify-content:space-between}
+.sav-box{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:14px 16px;margin-top:14px;display:flex;align-items:center;justify-content:space-between; flex-wrap: wrap; gap: 16px;}
 .sav-main-v{font-size:30px;font-weight:500;color:#0F6E56;line-height:1}
 .sav-main-l{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--color-text-secondary);margin-bottom:4px}
 .sav-main-sub{font-size:12px;color:var(--color-text-secondary);margin-top:4px}
@@ -115,13 +186,13 @@
 .sci-title{font-size:13px;font-weight:500;color:var(--color-text-primary);flex:1}
 .sci-body{display:none;padding:12px 14px;border-top:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);font-size:12px;color:var(--color-text-secondary);line-height:1.65}
 .sci-body.on{display:block}
-.sci-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.sci-stats{display:grid;grid-template-columns:repeat(auto-fit, minmax(100px, 1fr));gap:8px;margin-top:10px}
 .sci-stat{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:8px;text-align:center}
 .sci-stat-v{font-size:14px;font-weight:500;color:var(--color-text-primary)}
 .sci-stat-l{font-size:10px;color:var(--color-text-secondary);margin-top:2px}
 .sci-ask{font-size:11px;color:#1D9E75;background:none;border:none;cursor:pointer;margin-top:10px;padding:0;font-family:var(--font-sans);display:flex;align-items:center;gap:4px}
 
-.lc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.lc-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:8px;margin-bottom:12px}
 .lc-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px;cursor:pointer;background:var(--color-background-primary);transition:border-color .15s}
 .lc-card:hover,.lc-card.on{border-color:#1D9E75}
 .lc-card.on{background:#E1F5EE}
@@ -133,7 +204,36 @@
 
 .note{background:#E1F5EE;border-radius:var(--border-radius-md);padding:9px 12px;font-size:12px;color:#085041;display:flex;gap:8px;align-items:flex-start;margin-bottom:14px}
 .note i{font-size:14px;color:#0F6E56;flex-shrink:0;margin-top:1px}
+.eq-grid {display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:8px}
+
+/* FOOTER STYLES */
+.footer {text-align: center; padding: 20px 18px 12px; font-size: 11px; color: var(--color-text-secondary); border-top: 0.5px solid var(--color-border-tertiary); margin-top: auto;}
+.footer a {color: inherit; text-decoration: none;}
+.footer a:hover {color: var(--color-text-primary); text-decoration: underline;}
+
+/* AI CHAT WIDGET STYLES */
+.chat-fab {position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:#1D9E75;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.15);cursor:pointer;border:none;z-index:100;transition:transform 0.2s, background 0.2s;}
+.chat-fab:hover {transform:scale(1.05); background:#15805e;}
+.chat-panel {position:fixed;bottom:90px;right:24px;width:340px;height:450px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);box-shadow:0 8px 24px rgba(0,0,0,0.12);display:none;flex-direction:column;z-index:100;overflow:hidden;}
+.chat-panel.on {display:flex;}
+.chat-head {background:#1D9E75;color:#fff;padding:14px 16px;font-size:14px;font-weight:500;display:flex;justify-content:space-between;align-items:center;}
+.chat-head button {background:none;border:none;color:#fff;cursor:pointer;font-size:18px;}
+.chat-body {flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;font-size:13px;line-height:1.5;}
+.msg {padding:10px 12px;border-radius:var(--border-radius-md);max-width:85%; word-wrap: break-word;}
+.msg.user {background:var(--color-background-secondary);color:var(--color-text-primary);align-self:flex-end;border-bottom-right-radius:2px;}
+.msg.ai {background:#E1F5EE;color:#085041;align-self:flex-start;border-bottom-left-radius:2px;}
+.chat-foot {padding:12px;border-top:0.5px solid var(--color-border-tertiary);display:flex;gap:8px;background:var(--color-background-primary);}
+.chat-foot input {flex:1;padding:8px 12px;border:1px solid var(--color-border-secondary);border-radius:20px;font-family:var(--font-sans);font-size:13px;background:var(--color-background-primary);color:var(--color-text-primary);outline:none;}
+.chat-foot input:focus {border-color:#1D9E75;}
+.chat-foot button {background:#1D9E75;color:#fff;border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer; flex-shrink:0;}
+.chat-foot button:hover {background:#15805e;}
+@media (max-width: 400px) {
+    .chat-panel {width:calc(100% - 32px);right:16px;height:400px;bottom: 86px;}
+    .chat-fab {right: 16px; bottom: 16px;}
+}
 </style>
+</head>
+<body>
 
 <h2 class="sr-only">Carbon footprint awareness platform — dashboard, source details, lifecycle, tracker, actions, comparison, and science explainers</h2>
 
@@ -144,7 +244,18 @@
     <div class="brand-mark"><i class="ti ti-leaf" aria-hidden="true"></i></div>
     Carbon Footprint Platform
   </div>
-  <div class="live-pill">Total: <b id="top-score">8.4</b>t CO₂/yr</div>
+  <div class="topbar-actions">
+    <div id="google_translate_element"></div>
+    <button class="icon-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode"><i class="ti ti-moon" id="theme-icon"></i></button>
+    <div style="position: relative;">
+      <button class="icon-btn" onclick="toggleA11yMenu()" title="Accessibility Options"><i class="ti ti-accessible"></i></button>
+      <div class="a11y-menu" id="a11y-menu">
+        <button id="btn-text-size" onclick="toggleTextSize()"><i class="ti ti-typography"></i> Large Text</button>
+        <button id="btn-contrast" onclick="toggleContrast()"><i class="ti ti-contrast"></i> High Contrast</button>
+      </div>
+    </div>
+    <div class="live-pill">Total: <b id="top-score">8.4</b>t CO₂/yr</div>
+  </div>
 </div>
 
 <div class="tabs" role="tablist">
@@ -216,12 +327,12 @@
       <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#D85A30"></span>Your CO₂</span>
       <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#B4B2A9"></span>Paris target (2.0t)</span>
     </div>
-    <div style="position:relative;height:190px"><canvas id="trendC" role="img" aria-label="Line chart: monthly CO2 declining from 9.8t in July to 8.4t in June">Jul 9.8, Aug 9.5, Sep 9.1, Oct 9.0, Nov 8.7, Dec 8.4, Jan 8.3, Feb 8.5, Mar 8.6, Apr 8.2, May 8.3, Jun 8.4.</canvas></div>
+    <div style="position:relative;height:190px; width: 100%;"><canvas id="trendC" role="img" aria-label="Line chart: monthly CO2 declining from 9.8t in July to 8.4t in June">Jul 9.8, Aug 9.5, Sep 9.1, Oct 9.0, Nov 8.7, Dec 8.4, Jan 8.3, Feb 8.5, Mar 8.6, Apr 8.2, May 8.3, Jun 8.4.</canvas></div>
   </div>
 
   <div style="background:#E1F5EE;border-radius:var(--border-radius-md);padding:12px 14px">
     <div style="font-size:12px;font-weight:500;color:#0F6E56;margin-bottom:8px;display:flex;align-items:center;gap:6px"><i class="ti ti-bulb" aria-hidden="true" style="font-size:15px"></i>What your <span id="dash-total">8.4</span>t footprint equals</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+    <div class="eq-grid">
       <div style="background:#fff;border-radius:var(--border-radius-md);padding:9px;text-align:center"><div style="font-size:16px;font-weight:500;color:#085041" id="eq-trees">378</div><div style="font-size:10px;color:#0F6E56;margin-top:2px">Trees to offset</div></div>
       <div style="background:#fff;border-radius:var(--border-radius-md);padding:9px;text-align:center"><div style="font-size:16px;font-weight:500;color:#085041" id="eq-km">37,100</div><div style="font-size:10px;color:#0F6E56;margin-top:2px">km of driving</div></div>
       <div style="background:#fff;border-radius:var(--border-radius-md);padding:9px;text-align:center"><div style="font-size:16px;font-weight:500;color:#085041" id="eq-coal">3.7</div><div style="font-size:10px;color:#0F6E56;margin-top:2px">Tonnes of coal</div></div>
@@ -248,7 +359,7 @@
       <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#85B7EB"></span>Direct use</span>
       <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#97C459"></span>Downstream</span>
     </div>
-    <div style="position:relative;height:240px"><canvas id="lcC" role="img" aria-label="Stacked bar chart of lifecycle carbon by sector">Transport, Food, Housing, Goods, Services lifecycle emissions.</canvas></div>
+    <div style="position:relative;height:240px; width:100%;"><canvas id="lcC" role="img" aria-label="Stacked bar chart of lifecycle carbon by sector">Transport, Food, Housing, Goods, Services lifecycle emissions.</canvas></div>
   </div>
 </div>
 
@@ -257,36 +368,36 @@
   <div class="grid2">
     <div class="card">
       <div class="card-hd"><i class="ti ti-car" aria-hidden="true" style="font-size:13px;margin-right:3px"></i>Transport</div>
-      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-km">Weekly km driven</label><span class="sl-val" id="lv-km">240 km</span></div><input type="range" id="s-km" min="0" max="800" step="10" value="240" oninput="sv('km',this.value,' km');rc()"></div>
-      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-fuel">Vehicle type</label><span class="sl-val" id="lv-fuel">Petrol</span></div><input type="range" id="s-fuel" min="0" max="3" step="1" value="2" oninput="sfuel(this.value);rc()"></div>
-      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-transit">Transit days/week</label><span class="sl-val" id="lv-transit">1 day</span></div><input type="range" id="s-transit" min="0" max="7" step="1" value="1" oninput="sv('transit',this.value,+this.value===1?' day':' days');rc()"></div>
+      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-km">Weekly km driven</label><span class="sl-val" id="lv-km">240 km</span></div><input type="range" id="s-km" min="0" max="800" step="10" value="240" oninput="sv('km',this.value,' km');rc()" style="width:100%"></div>
+      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-fuel">Vehicle type</label><span class="sl-val" id="lv-fuel">Petrol</span></div><input type="range" id="s-fuel" min="0" max="3" step="1" value="2" oninput="sfuel(this.value);rc()" style="width:100%"></div>
+      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-transit">Transit days/week</label><span class="sl-val" id="lv-transit">1 day</span></div><input type="range" id="s-transit" min="0" max="7" step="1" value="1" oninput="sv('transit',this.value,+this.value===1?' day':' days');rc()" style="width:100%"></div>
     </div>
     <div class="card">
       <div class="card-hd"><i class="ti ti-bolt" aria-hidden="true" style="font-size:13px;margin-right:3px"></i>Home energy</div>
-      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-home">Home size</label><span class="sl-val" id="lv-home">85 m²</span></div><input type="range" id="s-home" min="20" max="400" step="5" value="85" oninput="sv('home',this.value,' m²');rc()"></div>
-      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-renew">Renewable share</label><span class="sl-val" id="lv-renew">20%</span></div><input type="range" id="s-renew" min="0" max="100" step="5" value="20" oninput="sv('renew',this.value,'%');rc()"></div>
+      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-home">Home size</label><span class="sl-val" id="lv-home">85 m²</span></div><input type="range" id="s-home" min="20" max="400" step="5" value="85" oninput="sv('home',this.value,' m²');rc()" style="width:100%"></div>
+      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-renew">Renewable share</label><span class="sl-val" id="lv-renew">20%</span></div><input type="range" id="s-renew" min="0" max="100" step="5" value="20" oninput="sv('renew',this.value,'%');rc()" style="width:100%"></div>
     </div>
     <div class="card">
       <div class="card-hd"><i class="ti ti-salad" aria-hidden="true" style="font-size:13px;margin-right:3px"></i>Food & diet</div>
-      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-meat">Meat meals/week</label><span class="sl-val" id="lv-meat">5 meals</span></div><input type="range" id="s-meat" min="0" max="21" step="1" value="5" oninput="sv('meat',this.value,+this.value===1?' meal':' meals');rc()"></div>
-      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-local">Local/organic share</label><span class="sl-val" id="lv-local">30%</span></div><input type="range" id="s-local" min="0" max="100" step="5" value="30" oninput="sv('local',this.value,'%');rc()"></div>
+      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-meat">Meat meals/week</label><span class="sl-val" id="lv-meat">5 meals</span></div><input type="range" id="s-meat" min="0" max="21" step="1" value="5" oninput="sv('meat',this.value,+this.value===1?' meal':' meals');rc()" style="width:100%"></div>
+      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-local">Local/organic share</label><span class="sl-val" id="lv-local">30%</span></div><input type="range" id="s-local" min="0" max="100" step="5" value="30" oninput="sv('local',this.value,'%');rc()" style="width:100%"></div>
     </div>
     <div class="card">
       <div class="card-hd"><i class="ti ti-plane" aria-hidden="true" style="font-size:13px;margin-right:3px"></i>Flights</div>
-      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-short">Short-haul/year</label><span class="sl-val" id="lv-short">1 flight</span></div><input type="range" id="s-short" min="0" max="20" step="1" value="1" oninput="sv('short',this.value,+this.value===1?' flight':' flights');rc()"></div>
-      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-long">Long-haul/year</label><span class="sl-val" id="lv-long">0 flights</span></div><input type="range" id="s-long" min="0" max="10" step="1" value="0" oninput="sv('long',this.value,+this.value===1?' flight':' flights');rc()"></div>
+      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-short">Short-haul/year</label><span class="sl-val" id="lv-short">1 flight</span></div><input type="range" id="s-short" min="0" max="20" step="1" value="1" oninput="sv('short',this.value,+this.value===1?' flight':' flights');rc()" style="width:100%"></div>
+      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-long">Long-haul/year</label><span class="sl-val" id="lv-long">0 flights</span></div><input type="range" id="s-long" min="0" max="10" step="1" value="0" oninput="sv('long',this.value,+this.value===1?' flight':' flights');rc()" style="width:100%"></div>
     </div>
   </div>
   <div class="card">
     <div class="card-hd">Live breakdown</div>
-    <div style="display:flex;gap:14px;margin-bottom:8px;font-size:11px;color:var(--color-text-secondary)">
+    <div style="display:flex;gap:14px;margin-bottom:8px;font-size:11px;color:var(--color-text-secondary); flex-wrap:wrap;">
       <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#EF9F27"></span>Transport</span>
       <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#85B7EB"></span>Energy</span>
       <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#97C459"></span>Food</span>
       <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#B4B2A9"></span>Shopping</span>
       <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#AFA9EC"></span>Flights</span>
     </div>
-    <div style="position:relative;height:200px"><canvas id="catC" role="img" aria-label="Horizontal bar chart of CO2 by category">Category breakdown updates with sliders.</canvas></div>
+    <div style="position:relative;height:200px; width:100%;"><canvas id="catC" role="img" aria-label="Horizontal bar chart of CO2 by category">Category breakdown updates with sliders.</canvas></div>
   </div>
 </div>
 
@@ -323,7 +434,7 @@
       <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#9FE1CB"></span>Paris target</span>
       <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#B4B2A9"></span>Benchmarks</span>
     </div>
-    <div style="position:relative;height:260px"><canvas id="cmpC" role="img" aria-label="Horizontal bar chart comparing your CO2 to global benchmarks">You 8.4t, India 1.9t, World 4.7t, EU 6.8t, US 14.9t, Paris 2030 2.0t.</canvas></div>
+    <div style="position:relative;height:260px; width:100%;"><canvas id="cmpC" role="img" aria-label="Horizontal bar chart comparing your CO2 to global benchmarks">You 8.4t, India 1.9t, World 4.7t, EU 6.8t, US 14.9t, Paris 2030 2.0t.</canvas></div>
   </div>
 </div>
 
@@ -333,13 +444,143 @@
 </div>
 
 </div>
+
+<div class="footer">
+  Carbon Footprint Awareness Platform &nbsp;&middot;&nbsp; Built for Hack2skill PromptWars Challenge 3 (By-ᐺᓰᖇᘿᘉᕲᖇᗩ ᘻᗩᘉᘿ) &nbsp;&middot;&nbsp; Data sources: IPCC, IEA, Our World in Data
 </div>
+
+<button class="chat-fab" id="chat-fab" onclick="toggleChat()" aria-label="Open AI Adviser">
+  <i class="ti ti-message-chatbot"></i>
+</button>
+
+<div class="chat-panel" id="chat-panel">
+  <div class="chat-head">
+    <div style="display:flex; align-items:center; gap:8px;"><i class="ti ti-robot" style="font-size:18px"></i> AI Climate Adviser</div>
+    <button onclick="toggleChat()" aria-label="Close chat"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="chat-body" id="chat-body">
+    <div class="msg ai">Hi there! I'm your AI Climate Adviser. How can I help you understand or reduce your carbon footprint today?</div>
+  </div>
+  <div class="chat-foot">
+    <input type="text" id="chat-input" placeholder="Ask about your footprint..." onkeypress="if(event.key==='Enter') sendChat()">
+    <button onclick="sendChat()" aria-label="Send message"><i class="ti ti-send" style="font-size:16px;"></i></button>
+  </div>
+</div>
+
+</div>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'en',
+    includedLanguages: 'hi,mr,bn,te,ta,gu,kn,ml,pa,or,as,ur', // Major Indian Languages
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+  }, 'google_translate_element');
+}
+</script>
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
+/* THEME & A11Y LOGIC */
+let isDark = false;
+let chartInstances = [];
+
+function toggleTheme() {
+  isDark = !isDark;
+  document.documentElement.classList.toggle('dark-theme', isDark);
+  document.getElementById('theme-icon').className = isDark ? 'ti ti-sun' : 'ti ti-moon';
+  updateChartsTheme();
+}
+
+function toggleA11yMenu() {
+  document.getElementById('a11y-menu').classList.toggle('on');
+}
+
+function toggleTextSize() {
+  const root = document.documentElement;
+  const btn = document.getElementById('btn-text-size');
+  const isOn = root.classList.toggle('large-text');
+  btn.classList.toggle('active', isOn);
+}
+
+function toggleContrast() {
+  const root = document.documentElement;
+  const btn = document.getElementById('btn-contrast');
+  const isOn = root.classList.toggle('high-contrast');
+  btn.classList.toggle('active', isOn);
+  updateChartsTheme();
+}
+
+// Close a11y menu when clicking outside
+document.addEventListener('click', function(e) {
+  if(!e.target.closest('#a11y-menu') && !e.target.closest('[onclick="toggleA11yMenu()"]')) {
+    document.getElementById('a11y-menu').classList.remove('on');
+  }
+});
+
+/* AI CHAT LOGIC */
+function toggleChat() {
+  const panel = document.getElementById('chat-panel');
+  const on = panel.classList.contains('on');
+  panel.classList.toggle('on', !on);
+  if (!on) {
+    document.getElementById('chat-input').focus();
+  }
+}
+
+function sendPrompt(topic) {
+  const panel = document.getElementById('chat-panel');
+  if (!panel.classList.contains('on')) toggleChat();
+  
+  const input = document.getElementById('chat-input');
+  input.value = "Tell me more about: " + topic;
+  setTimeout(sendChat, 300);
+}
+
+function sendChat() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  
+  appendMsg(text, 'user');
+  input.value = '';
+  
+  setTimeout(() => {
+    let aiResp = "That's an important topic. ";
+    const tLower = text.toLowerCase();
+    
+    if (tLower.includes('co₂e') || tLower.includes('methane') || tLower.includes('equivalent')) {
+      aiResp += "Because different gases trap heat differently, CO₂e gives us a single metric. For example, the 84x multiplier for methane is why food waste and agriculture are such critical focus areas!";
+    } else if (tLower.includes('tipping point') || tLower.includes('feedback')) {
+      aiResp += "Tipping points represent thresholds where climate change becomes self-sustaining. This underscores why immediate footprint reduction is far more valuable than delayed action.";
+    } else if (tLower.includes('paris') || tLower.includes('1.5°c') || tLower.includes('target')) {
+      aiResp += "The 2.0t Paris target is a global per-capita goal. While your current score is 8.4t, using the tracker tab to model changes to your transport or energy can show you a clear path downward.";
+    } else if (tLower.includes('scope')) {
+      aiResp += "Scope 3 emissions are tricky because they are hidden in everything we buy. Choosing to repair items or buy secondhand drastically reduces this part of your footprint.";
+    } else if (tLower.includes('sinks') || tLower.includes('forest') || tLower.includes('ocean')) {
+      aiResp += "While sinks like forests are vital, their capacity is finite. A single tree absorbs about 22kg/year, meaning it takes hundreds of trees to offset an average lifestyle. Reduction must always come before offsetting.";
+    } else {
+      aiResp += "Based on your current data, your highest emission source is transport. Focusing on public transit or reducing meat intake are often the fastest ways to lower your score. Would you like tips on a specific category?";
+    }
+    
+    appendMsg(aiResp, 'ai');
+  }, 900);
+}
+
+function appendMsg(text, sender) {
+  const body = document.getElementById('chat-body');
+  const div = document.createElement('div');
+  div.className = 'msg ' + sender;
+  div.textContent = text;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+
+/* MAIN APP LOGIC */
 const em={transport:3.8,energy:2.1,food:1.5,flights:0.2,shopping:0.8};
 const FL=['EV','Hybrid','Petrol','Diesel'];
-let catChart;
 
 function tot(){return +Object.values(em).reduce((a,b)=>a+b,0).toFixed(1)}
 
@@ -399,7 +640,7 @@ function updateAll(){
   document.getElementById('eq-coal').textContent=(t*0.44).toFixed(1);
   document.getElementById('eq-flights').textContent=Math.round(t/0.13);
 
-  if(catChart){catChart.data.datasets[0].data=[em.transport,em.energy,em.food,em.shopping,em.flights];catChart.update('none')}
+  if(chartInstances[1]){chartInstances[1].data.datasets[0].data=[em.transport,em.energy,em.food,em.shopping,em.flights];chartInstances[1].update('none')}
   updateSavings();
   refreshSourceVals();
 }
@@ -439,7 +680,7 @@ function renderSources(){
     const el=document.createElement('div');
     el.className='src-item';el.id='si-'+s.id;
     el.innerHTML=`<div class="src-head" id="sh-${s.id}" onclick="toggleSrc('${s.id}')" role="button" tabindex="0" aria-expanded="false">
-      <div class="src-icon" style="background:${s.bg}"><i class="${s.icon}" aria-hidden="true"></i></div>
+      <div class="src-icon" style="background:${s.bg}"><i class="${s.icon}" aria-hidden="true" style="color:#000"></i></div>
       <div class="src-meta"><div class="src-name">${s.name}</div><div class="src-sub">${s.sub}</div></div>
       <div class="src-right"><div class="src-t" id="sv-${s.id}">${s.val().toFixed(1)}t</div><div class="src-pct" id="sp-${s.id}"></div></div>
       <i class="ti ti-chevron-down" id="sc-${s.id}" aria-hidden="true" style="font-size:16px;color:var(--color-text-secondary);transition:transform .2s;flex-shrink:0"></i>
@@ -520,7 +761,7 @@ function renderActions(){
     item.className='act-item';item.id='ai-'+i;
     item.innerHTML=`<div class="act-row">
       <div class="act-left">
-        <div class="act-icon"><i class="${a.icon}" aria-hidden="true" style="font-size:17px;color:var(--color-text-secondary)"></i></div>
+        <div class="act-icon"><i class="${a.icon}" aria-hidden="true" style="font-size:17px;color:var(--color-text-primary)"></i></div>
         <div>
           <div class="act-name">${a.name}</div>
           <div class="act-save">Saves up to ${a.save.toFixed(1)}t CO₂/yr</div>
@@ -601,7 +842,7 @@ function renderScience(){
     <div class="sci-body" id="sci-b-${i}">
       ${s.body}
       <div class="sci-stats">${s.stats.map(st=>`<div class="sci-stat"><div class="sci-stat-v">${st.v}</div><div class="sci-stat-l">${st.l}</div></div>`).join('')}</div>
-      <button class="sci-ask" onclick="sendPrompt('Tell me more about: ${s.title.replace(/'/g,'')}')" aria-label="Ask Claude about this topic"><i class="ti ti-external-link" aria-hidden="true" style="font-size:13px"></i>Explore further ↗</button>
+      <button class="sci-ask" onclick="sendPrompt('${s.title.replace(/'/g,'')}')" aria-label="Ask AI about this topic"><i class="ti ti-external-link" aria-hidden="true" style="font-size:13px"></i>Explore further with AI ↗</button>
     </div>`;
     item.querySelector('.sci-head').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')toggleSci(i)});
     list.appendChild(item);
@@ -619,24 +860,30 @@ function toggleSci(i){
   if(!on){body.classList.add('on');head.setAttribute('aria-expanded','true');ic.style.transform='rotate(180deg)'}
 }
 
-window.addEventListener('load',()=>{
-  const dark=matchMedia('(prefers-color-scheme:dark)').matches;
-  const gc=dark?'rgba(255,255,255,.06)':'rgba(0,0,0,.05)';
-  const tc=dark?'rgba(255,255,255,.4)':'rgba(0,0,0,.35)';
-  const tw=dark?'rgba(255,255,255,.16)':'rgba(0,0,0,.14)';
+function initCharts() {
+  const rootStyle = getComputedStyle(document.documentElement);
+  const getCol = (name, fallback) => rootStyle.getPropertyValue(name).trim() || fallback;
+  
+  const gc = getCol('--color-border-secondary', 'rgba(0,0,0,0.1)');
+  const tc = getCol('--color-text-secondary', 'rgba(0,0,0,0.6)');
 
-  new Chart(document.getElementById('trendC'),{
+  if(chartInstances.length > 0) {
+    chartInstances.forEach(c => c.destroy());
+    chartInstances = [];
+  }
+
+  const c1 = new Chart(document.getElementById('trendC'),{
     type:'line',
     data:{labels:['Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun'],
       datasets:[
         {label:'CO₂',data:[9.8,9.5,9.1,9.0,8.7,8.4,8.3,8.5,8.6,8.2,8.3,8.4],borderColor:'#D85A30',backgroundColor:'rgba(216,90,48,.07)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#D85A30',borderWidth:2},
-        {label:'Paris',data:Array(12).fill(2.0),borderColor:tw,borderDash:[5,4],borderWidth:1.5,pointRadius:0,fill:false}
+        {label:'Paris',data:Array(12).fill(2.0),borderColor:'#9ca3af',borderDash:[5,4],borderWidth:1.5,pointRadius:0,fill:false}
       ]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
       scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:11}}},y:{grid:{color:gc},ticks:{color:tc,font:{size:11},callback:v=>v+'t'},min:0}}}
   });
 
-  catChart=new Chart(document.getElementById('catC'),{
+  const c2 = new Chart(document.getElementById('catC'),{
     type:'bar',indexAxis:'y',
     data:{labels:['Transport','Energy','Food','Shopping','Flights'],
       datasets:[{data:[3.8,2.1,1.5,0.8,0.2],backgroundColor:['#EF9F27','#85B7EB','#97C459','#B4B2A9','#AFA9EC']}]},
@@ -644,7 +891,7 @@ window.addEventListener('load',()=>{
       scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:11},callback:v=>v+'t'}},y:{grid:{color:gc},ticks:{color:tc,font:{size:11}}}}}
   });
 
-  new Chart(document.getElementById('cmpC'),{
+  const c3 = new Chart(document.getElementById('cmpC'),{
     type:'bar',indexAxis:'y',
     data:{labels:['You','India','World','EU','US','Paris 2030'],
       datasets:[{data:[8.4,1.9,4.7,6.8,14.9,2.0],backgroundColor:['#1D9E75','#B4B2A9','#B4B2A9','#B4B2A9','#B4B2A9','#9FE1CB']}]},
@@ -652,7 +899,7 @@ window.addEventListener('load',()=>{
       scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:11},callback:v=>v+'t'}},y:{grid:{color:gc},ticks:{color:tc,font:{size:11}}}}}
   });
 
-  new Chart(document.getElementById('lcC'),{
+  const c4 = new Chart(document.getElementById('lcC'),{
     type:'bar',
     data:{labels:['Transport','Food','Housing','Goods','Services'],
       datasets:[
@@ -664,10 +911,27 @@ window.addEventListener('load',()=>{
       scales:{x:{stacked:true,grid:{color:gc},ticks:{color:tc,font:{size:11}}},y:{stacked:true,grid:{color:gc},ticks:{color:tc,font:{size:11},callback:v=>v+'kg'}}}}
   });
 
+  chartInstances.push(c1, c2, c3, c4);
+}
+
+function updateChartsTheme() {
+  setTimeout(initCharts, 50); // slight delay to allow CSS vars to update
+}
+
+window.addEventListener('load',()=>{
+  if(matchMedia('(prefers-color-scheme:dark)').matches) {
+    isDark = true;
+    document.documentElement.classList.add('dark-theme');
+    document.getElementById('theme-icon').className = 'ti ti-sun';
+  }
+  
   renderSources();
   renderActions();
   renderLifecycle();
   renderScience();
   updateAll();
+  initCharts();
 });
 </script>
+</body>
+</html>
