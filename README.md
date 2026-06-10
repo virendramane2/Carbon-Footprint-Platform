@@ -7,11 +7,8 @@ Carbon Footprint Platform is a smart sustainability awareness platform designed 
 - 📊 Carbon Footprint Calculator
 - 🤖 Smart Sustainability Advisor
 - 🌙 Dark Mode Support
-- 📄 Downloadable Emission Report
 - 📱 Mobile Responsive Design
 - 🌍 Sustainability Awareness Dashboard
-- ⚡ Real-Time Emission Estimates
-- 🏆 Hackathon Ready
 
 ## 🧮 How It Works
 
@@ -28,7 +25,6 @@ The platform estimates annual CO₂ emissions and provides personalized recommen
 
 - HTML5
 - CSS3
-- JavaScript
 
 ## 🎯 Purpose
 
@@ -38,7 +34,6 @@ The Carbon Footprint Platform promotes climate awareness by helping individuals 
 
 - Advanced AI Sustainability Advisor
 - Interactive Carbon Analytics
-- PDF Report Generation
 - Carbon Footprint History Tracking
 - Renewable Energy Impact Calculator
 - Community Sustainability Challenges
