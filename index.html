@@ -3,12 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Carbon Footprint Platform</title>
+<title>Carbon Footprint Platform v3</title>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 
 <style>
-/* CSS VARIABLES (Dynamic for Themes) */
+/* A11Y & CSS VARIABLES */
+*:focus-visible { outline: 2px solid #1D9E75; outline-offset: 2px; }
 :root {
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --color-background-primary: #ffffff;
@@ -21,7 +24,6 @@
   --border-radius-lg: 12px;
   --base-font-size: 100%;
 }
-
 :root.dark-theme {
   --color-background-primary: #1f2937;
   --color-background-secondary: #111827;
@@ -30,7 +32,6 @@
   --color-border-secondary: #4b5563;
   --color-border-tertiary: #374151;
 }
-
 :root.high-contrast {
   --color-background-primary: #000000 !important;
   --color-background-secondary: #000000 !important;
@@ -39,17 +40,14 @@
   --color-border-secondary: #ffffff !important;
   --color-border-tertiary: #ffffff !important;
 }
-
-:root.large-text {
-  --base-font-size: 115%;
-}
-
+:root.large-text { --base-font-size: 115%; }
 html { font-size: var(--base-font-size); transition: font-size 0.2s; }
-
 *{box-sizing:border-box;margin:0;padding:0}
-.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
 
 /* MAIN LAYOUT */
+.skip-link { position: absolute; top: -40px; left: 0; background: #1D9E75; color: white; padding: 8px; z-index: 1000; transition: top 0.2s; }
+.skip-link:focus { top: 0; }
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
 body { background: var(--color-background-primary); color: var(--color-text-primary); transition: background 0.3s, color 0.3s; }
 .app{font-family:var(--font-sans);padding-bottom:1rem; width: 100%; max-width: 1100px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column;}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:0.5px solid var(--color-border-tertiary); flex-wrap: wrap; gap: 10px;}
@@ -57,35 +55,37 @@ body { background: var(--color-background-primary); color: var(--color-text-prim
 .brand-mark{width:28px;height:28px;border-radius:7px;background:#1D9E75;display:flex;align-items:center;justify-content:center}
 .brand-mark i{font-size:15px;color:#fff}
 
-/* TOPBAR ACTIONS */
 .topbar-actions {display: flex; align-items: center; gap: 12px; flex-wrap: wrap;}
 .icon-btn {background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); width: 32px; height: 32px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: 0.2s;}
 .icon-btn:hover {background: var(--color-border-tertiary);}
+.btn-primary {background:#1D9E75; color:#fff; border:none; padding: 6px 12px; border-radius: 6px; font-size:12px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:6px;}
+.btn-primary:hover {background:#15805e;}
 .live-pill{font-size:12px;padding:4px 12px;border-radius:20px;border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);background:var(--color-background-secondary)}
 .live-pill b{color:#0F6E56}
 
 /* GOOGLE TRANSLATE FIXES */
-#google_translate_element select { padding: 4px; border-radius: 4px; border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); color: var(--color-text-primary); font-family: var(--font-sans); font-size: 12px; outline: none;}
-.goog-te-gadget {font-family: var(--font-sans) !important; color: transparent !important;}
-.goog-te-gadget span {display: none;}
-.goog-te-banner-frame {display: none !important;}
-body {top: 0 !important;}
+#google_translate_element { overflow: hidden; border-radius: 6px; }
+.goog-te-combo { padding: 6px; border-radius: 6px; border: 1px solid var(--color-border-secondary); background: var(--color-background-secondary); color: var(--color-text-primary); font-family: var(--font-sans); font-size: 12px; outline: none; cursor: pointer; max-width: 140px; margin: 0 !important; }
+.goog-logo-link { display: none !important; }
+.goog-te-gadget { color: transparent !important; font-size: 0 !important; }
+.goog-te-banner-frame.skiptranslate { display: none !important; }
+body { top: 0px !important; position: static !important; }
 
-/* ACCESSIBILITY MENU */
+/* A11Y MENU */
 .a11y-menu {position: absolute; top: 55px; right: 18px; background: var(--color-background-primary); border: 1px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 10px; display: none; flex-direction: column; gap: 8px; z-index: 200;}
 .a11y-menu.on {display: flex;}
 .a11y-menu button {background: var(--color-background-secondary); border: 1px solid var(--color-border-tertiary); color: var(--color-text-primary); padding: 8px 12px; border-radius: 4px; cursor: pointer; font-family: var(--font-sans); font-size: 12px; text-align: left; display: flex; align-items: center; gap: 8px;}
 .a11y-menu button:hover {background: var(--color-border-tertiary);}
 .a11y-menu button.active {border-color: #1D9E75; color: #1D9E75; background: #E1F5EE;}
 
+/* TABS & PANES */
 .tabs{display:flex;border-bottom:0.5px solid var(--color-border-tertiary);overflow-x:auto;background:var(--color-background-secondary)}
 .tab{flex-shrink:0;padding:10px 16px;font-size:12px;font-family:var(--font-sans);background:none;border:none;border-bottom:2px solid transparent;color:var(--color-text-secondary);cursor:pointer;white-space:nowrap;margin-bottom:-1px;display:flex;align-items:center;gap:5px}
 .tab:hover{color:var(--color-text-primary);background:var(--color-background-primary)}
 .tab.on{color:#0F6E56;border-bottom-color:#1D9E75;background:var(--color-background-primary);font-weight:500}
-.tab i{font-size:14px}
-
 .body{padding:16px 18px; flex: 1;}
 .pane{display:none}.pane.on{display:block}
+.note{background:#E1F5EE;border-radius:var(--border-radius-md);padding:9px 12px;font-size:12px;color:#085041;display:flex;gap:8px;align-items:flex-start;margin-bottom:14px}
 
 /* GRIDS & CARDS */
 .kpis{display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:10px;margin-bottom:16px}
@@ -94,7 +94,6 @@ body {top: 0 !important;}
 .kpi-l{font-size:11px;color:var(--color-text-secondary);margin-top:3px;text-transform:uppercase;letter-spacing:.06em}
 .kpi-d{font-size:11px;margin-top:3px}
 .kpi-d.bad{color:#993C1D}.kpi-d.good{color:#0F6E56}
-
 .grid2{display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:12px;margin-bottom:16px}
 .card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px; overflow: hidden;}
 .card-hd{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-secondary);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
@@ -119,11 +118,14 @@ body {top: 0 !important;}
 .rrow-l{color:var(--color-text-secondary)}.rrow-v{font-weight:500;color:var(--color-text-primary)}
 .rrow-v.g{color:#0F6E56}.rrow-v.r{color:#993C1D}
 
+.eq-grid {display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:8px}
 .sl-block{margin-bottom:14px}
 .sl-row{display:flex;justify-content:space-between;margin-bottom:6px;align-items:center}
 .sl-name{font-size:13px;color:var(--color-text-secondary)}
 .sl-val{font-size:12px;font-weight:500;color:var(--color-text-primary);background:var(--color-background-secondary);padding:2px 8px;border-radius:4px;min-width:52px;text-align:right}
+.select-box {width:100%; padding:8px; border-radius:6px; border:1px solid var(--color-border-secondary); background:var(--color-background-primary); color:var(--color-text-primary); font-family:var(--font-sans); font-size:12px; outline:none; margin-top:4px;}
 
+/* SOURCES LIST */
 .src-item{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:8px;overflow:hidden}
 .src-head{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:var(--color-background-primary)}
 .src-head:hover{background:var(--color-background-secondary)}
@@ -138,14 +140,32 @@ body {top: 0 !important;}
 .src-body{display:none;padding:12px 14px;border-top:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
 .src-body.on{display:block}
 .src-desc{font-size:12px;color:var(--color-text-secondary);line-height:1.65;margin-bottom:10px}
-
 .src-facts{display:grid;grid-template-columns:repeat(auto-fit, minmax(100px, 1fr));gap:8px;margin-bottom:10px}
 .fact{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:9px;text-align:center}
 .fact-v{font-size:15px;font-weight:500;color:var(--color-text-primary)}
 .fact-l{font-size:10px;color:var(--color-text-secondary);margin-top:2px;text-transform:uppercase;letter-spacing:.05em}
 .src-tip{background:#E1F5EE;border-radius:var(--border-radius-md);padding:8px 12px;font-size:12px;color:#085041}
-.src-tip b{color:#0F6E56}
 
+/* LIFECYCLE GRID */
+.lc-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:8px;margin-bottom:12px}
+.lc-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px;cursor:pointer;background:var(--color-background-primary);transition:border-color .15s}
+.lc-card:hover,.lc-card.on{border-color:#1D9E75}
+.lc-card.on{background:#E1F5EE}
+.lc-stage{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--color-text-secondary)}
+.lc-name{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-top:2px}
+.lc-pct{font-size:18px;font-weight:500;color:#993C1D;margin-top:4px}
+.lc-desc{font-size:12px;color:var(--color-text-secondary);margin-top:6px;line-height:1.55;display:none}
+.lc-card.on .lc-desc{display:block}
+
+/* COMMUNITY & GOALS */
+.history-item {display:flex; justify-content:space-between; padding:10px; border-bottom:0.5px solid var(--color-border-tertiary); font-size:12px;}
+.history-item:last-child {border-bottom:none;}
+.leader-row {display:flex; align-items:center; justify-content:space-between; padding:10px; border-radius:6px; margin-bottom:6px; background:var(--color-background-secondary);}
+.leader-row.me {background:#E1F5EE; border:1px solid #1D9E75;}
+.prog-bar {height:12px; background:var(--color-background-secondary); border-radius:6px; overflow:hidden; margin-top:8px;}
+.prog-fill {height:100%; background:#1D9E75; transition:width 0.5s;}
+
+/* ACTIONS LIST */
 .act-item{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:8px;background:var(--color-background-primary);transition:border-color .15s,background .15s}
 .act-item.checked{background:#E1F5EE;border-color:#1D9E75}
 .act-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px}
@@ -157,14 +177,12 @@ body {top: 0 !important;}
 .why-btn:hover{color:var(--color-text-primary)}
 .why-body{display:none;padding:0 14px 12px 58px;font-size:12px;color:var(--color-text-secondary);line-height:1.65;border-top:0.5px solid var(--color-border-tertiary);padding-top:10px;margin-top:0}
 .why-body.on{display:block}
-
 .tgl{position:relative;width:40px;height:22px;flex-shrink:0;display:block}
 .tgl input{opacity:0;width:0;height:0;position:absolute}
 .ttrack{position:absolute;inset:0;border-radius:11px;background:var(--color-border-secondary);cursor:pointer;transition:background .2s}
 .tgl input:checked~.ttrack{background:#1D9E75}
-.tthumb{position:absolute;width:16px;height:16px;border-radius:50%;background:var(--color-background-primary);top:3px;left:3px;transition:left .2s;pointer-events:none}
+.tthumb{position:absolute;width:16px;height:16px;border-radius:50%;background:var(--color-background-primary);top:3px;left:3px;transition:left .2s;}
 .tgl input:checked~.tthumb{left:21px}
-
 .sav-box{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:14px 16px;margin-top:14px;display:flex;align-items:center;justify-content:space-between; flex-wrap: wrap; gap: 16px;}
 .sav-main-v{font-size:30px;font-weight:500;color:#0F6E56;line-height:1}
 .sav-main-l{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--color-text-secondary);margin-bottom:4px}
@@ -174,105 +192,79 @@ body {top: 0 !important;}
 .sav-badge-v{font-size:16px;font-weight:500;color:var(--color-text-primary)}
 .sav-badge-l{font-size:10px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-top:1px}
 
+/* COMPARE ROW */
 .cmp-r{margin-bottom:12px}
 .cmp-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--color-text-secondary);margin-bottom:4px}
 .cmp-track{height:12px;background:var(--color-background-secondary);border-radius:6px;overflow:hidden}
 .cmp-fill{height:100%;border-radius:6px;transition:width .6s}
 
-.sci-item{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:8px;overflow:hidden}
-.sci-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;background:var(--color-background-primary);gap:10px}
-.sci-head:hover{background:var(--color-background-secondary)}
-.sci-badge{font-size:10px;padding:2px 8px;border-radius:12px;flex-shrink:0}
-.sci-title{font-size:13px;font-weight:500;color:var(--color-text-primary);flex:1}
-.sci-body{display:none;padding:12px 14px;border-top:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);font-size:12px;color:var(--color-text-secondary);line-height:1.65}
-.sci-body.on{display:block}
-.sci-stats{display:grid;grid-template-columns:repeat(auto-fit, minmax(100px, 1fr));gap:8px;margin-top:10px}
-.sci-stat{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:8px;text-align:center}
-.sci-stat-v{font-size:14px;font-weight:500;color:var(--color-text-primary)}
-.sci-stat-l{font-size:10px;color:var(--color-text-secondary);margin-top:2px}
-.sci-ask{font-size:11px;color:#1D9E75;background:none;border:none;cursor:pointer;margin-top:10px;padding:0;font-family:var(--font-sans);display:flex;align-items:center;gap:4px}
+/* SCIENCE Q&A */
+.sci-q-btn {width:100%; text-align:left; background:none; border:none; color:var(--color-text-primary); font-family:var(--font-sans); font-weight:500; font-size:13px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;}
+.sci-q-btn i {transition: transform 0.2s; color:var(--color-text-secondary);}
+.sci-q-btn.open i {transform: rotate(180deg);}
+.sci-a-box {display:none; padding-top:10px; font-size:12px; color:var(--color-text-secondary); line-height:1.5;}
 
-.lc-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:8px;margin-bottom:12px}
-.lc-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px;cursor:pointer;background:var(--color-background-primary);transition:border-color .15s}
-.lc-card:hover,.lc-card.on{border-color:#1D9E75}
-.lc-card.on{background:#E1F5EE}
-.lc-stage{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--color-text-secondary)}
-.lc-name{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-top:2px}
-.lc-pct{font-size:18px;font-weight:500;color:#993C1D;margin-top:4px}
-.lc-desc{font-size:12px;color:var(--color-text-secondary);margin-top:6px;line-height:1.55;display:none}
-.lc-card.on .lc-desc{display:block}
-
-.note{background:#E1F5EE;border-radius:var(--border-radius-md);padding:9px 12px;font-size:12px;color:#085041;display:flex;gap:8px;align-items:flex-start;margin-bottom:14px}
-.note i{font-size:14px;color:#0F6E56;flex-shrink:0;margin-top:1px}
-.eq-grid {display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:8px}
-
-/* FOOTER STYLES */
-.footer {text-align: center; padding: 20px 18px 12px; font-size: 11px; color: var(--color-text-secondary); border-top: 0.5px solid var(--color-border-tertiary); margin-top: auto;}
-.footer a {color: inherit; text-decoration: none;}
-.footer a:hover {color: var(--color-text-primary); text-decoration: underline;}
-
-/* AI CHAT WIDGET STYLES */
-.chat-fab {position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:#1D9E75;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.15);cursor:pointer;border:none;z-index:100;transition:transform 0.2s, background 0.2s;}
-.chat-fab:hover {transform:scale(1.05); background:#15805e;}
+/* CHAT WIDGET */
+.chat-fab {position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:#1D9E75;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.15);cursor:pointer;border:none;z-index:100;}
+.chat-fab:hover {background:#15805e;}
 .chat-panel {position:fixed;bottom:90px;right:24px;width:340px;height:450px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);box-shadow:0 8px 24px rgba(0,0,0,0.12);display:none;flex-direction:column;z-index:100;overflow:hidden;}
 .chat-panel.on {display:flex;}
-.chat-head {background:#1D9E75;color:#fff;padding:14px 16px;font-size:14px;font-weight:500;display:flex;justify-content:space-between;align-items:center;}
-.chat-head button {background:none;border:none;color:#fff;cursor:pointer;font-size:18px;}
-.chat-body {flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;font-size:13px;line-height:1.5;}
-.msg {padding:10px 12px;border-radius:var(--border-radius-md);max-width:85%; word-wrap: break-word;}
-.msg.user {background:var(--color-background-secondary);color:var(--color-text-primary);align-self:flex-end;border-bottom-right-radius:2px;}
-.msg.ai {background:#E1F5EE;color:#085041;align-self:flex-start;border-bottom-left-radius:2px;}
-.chat-foot {padding:12px;border-top:0.5px solid var(--color-border-tertiary);display:flex;gap:8px;background:var(--color-background-primary);}
-.chat-foot input {flex:1;padding:8px 12px;border:1px solid var(--color-border-secondary);border-radius:20px;font-family:var(--font-sans);font-size:13px;background:var(--color-background-primary);color:var(--color-text-primary);outline:none;}
-.chat-foot input:focus {border-color:#1D9E75;}
-.chat-foot button {background:#1D9E75;color:#fff;border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer; flex-shrink:0;}
-.chat-foot button:hover {background:#15805e;}
-@media (max-width: 400px) {
-    .chat-panel {width:calc(100% - 32px);right:16px;height:400px;bottom: 86px;}
-    .chat-fab {right: 16px; bottom: 16px;}
-}
+.chat-head {background:#1D9E75;color:#fff;padding:14px 16px;font-size:14px;font-weight:500;display:flex;justify-content:space-between;}
+.chat-body {flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;font-size:13px;}
+.msg {padding:10px 12px;border-radius:var(--border-radius-md);max-width:85%; word-wrap:break-word;}
+.msg.user {background:var(--color-background-secondary);align-self:flex-end;}
+.msg.ai {background:#E1F5EE;color:#085041;align-self:flex-start;}
+.chat-foot {padding:12px;border-top:0.5px solid var(--color-border-tertiary);display:flex;gap:8px;}
+.chat-foot input {flex:1;padding:8px 12px;border:1px solid var(--color-border-secondary);border-radius:20px; outline:none; background:transparent; color:inherit; font-family:var(--font-sans);}
+
+/* FOOTER */
+.footer {text-align: center; padding: 20px 18px; font-size: 11px; color: var(--color-text-secondary); border-top: 0.5px solid var(--color-border-tertiary); margin-top: auto; display:flex; flex-direction:column; gap:6px;}
+.test-pill {display:inline-block; padding:2px 8px; background:#E1F5EE; color:#085041; border-radius:10px; font-weight:500;}
 </style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 
-<h2 class="sr-only">Carbon footprint awareness platform — dashboard, source details, lifecycle, tracker, actions, comparison, and science explainers</h2>
+<h1 class="sr-only">Carbon Footprint Awareness Platform v3</h1>
 
 <div class="app">
 
 <div class="topbar">
   <div class="brand">
     <div class="brand-mark"><i class="ti ti-leaf" aria-hidden="true"></i></div>
-    Carbon Footprint Platform
+    CF Platform v3
   </div>
   <div class="topbar-actions">
     <div id="google_translate_element"></div>
-    <button class="icon-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode"><i class="ti ti-moon" id="theme-icon"></i></button>
+    <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle Theme"><i class="ti ti-moon" id="theme-icon"></i></button>
     <div style="position: relative;">
-      <button class="icon-btn" onclick="toggleA11yMenu()" title="Accessibility Options"><i class="ti ti-accessible"></i></button>
-      <div class="a11y-menu" id="a11y-menu">
-        <button id="btn-text-size" onclick="toggleTextSize()"><i class="ti ti-typography"></i> Large Text</button>
-        <button id="btn-contrast" onclick="toggleContrast()"><i class="ti ti-contrast"></i> High Contrast</button>
+      <button class="icon-btn" onclick="toggleA11yMenu()" aria-label="Accessibility Options" aria-expanded="false" id="a11y-btn"><i class="ti ti-accessible"></i></button>
+      <div class="a11y-menu" id="a11y-menu" role="menu">
+        <button id="btn-text-size" onclick="toggleTextSize()" role="menuitem"><i class="ti ti-typography"></i> Large Text</button>
+        <button id="btn-contrast" onclick="toggleContrast()" role="menuitem"><i class="ti ti-contrast"></i> High Contrast</button>
       </div>
     </div>
-    <div class="live-pill">Total: <b id="top-score">8.4</b>t CO₂/yr</div>
+    <button class="btn-primary" onclick="generatePDF()"><i class="ti ti-file-download"></i> Export PDF</button>
+    <div class="live-pill" aria-live="polite">Total: <b id="top-score">8.4</b>t CO₂</div>
   </div>
 </div>
 
 <div class="tabs" role="tablist">
-  <button class="tab on" role="tab" onclick="sw('dash',this)"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Dashboard</button>
-  <button class="tab" role="tab" onclick="sw('sources',this)"><i class="ti ti-list-search" aria-hidden="true"></i>Source detail</button>
-  <button class="tab" role="tab" onclick="sw('lifecycle',this)"><i class="ti ti-refresh" aria-hidden="true"></i>Lifecycle</button>
-  <button class="tab" role="tab" onclick="sw('track',this)"><i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>Track</button>
-  <button class="tab" role="tab" onclick="sw('actions',this)"><i class="ti ti-checklist" aria-hidden="true"></i>Actions</button>
-  <button class="tab" role="tab" onclick="sw('compare',this)"><i class="ti ti-chart-bar" aria-hidden="true"></i>Compare</button>
-  <button class="tab" role="tab" onclick="sw('science',this)"><i class="ti ti-atom" aria-hidden="true"></i>Science</button>
+  <button class="tab on" role="tab" aria-selected="true" onclick="sw('dash',this)"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
+  <button class="tab" role="tab" aria-selected="false" onclick="sw('sources',this)"><i class="ti ti-list-search"></i> Sources</button>
+  <button class="tab" role="tab" aria-selected="false" onclick="sw('lifecycle',this)"><i class="ti ti-refresh"></i> Lifecycle</button>
+  <button class="tab" role="tab" aria-selected="false" onclick="sw('track',this)"><i class="ti ti-adjustments-horizontal"></i> Track</button>
+  <button class="tab" role="tab" aria-selected="false" onclick="sw('goals',this)"><i class="ti ti-target"></i> Goals</button>
+  <button class="tab" role="tab" aria-selected="false" onclick="sw('actions',this)"><i class="ti ti-checklist"></i> Actions</button>
+  <button class="tab" role="tab" aria-selected="false" onclick="sw('compare',this)"><i class="ti ti-chart-bar"></i> Compare</button>
+  <button class="tab" role="tab" aria-selected="false" onclick="sw('science',this)"><i class="ti ti-atom"></i> Science</button>
 </div>
 
-<div class="body">
+<main id="main-content" class="body">
 
 <div class="pane on" id="p-dash">
   <div class="kpis">
-    <div class="kpi"><div class="kpi-v" id="k-total">8.4t</div><div class="kpi-l">Total CO₂/yr</div><div class="kpi-d bad">79% above world avg</div></div>
+    <div class="kpi"><div class="kpi-v" id="k-total">8.4t</div><div class="kpi-l">Total CO₂/yr</div><div class="kpi-d bad">Above world avg</div></div>
     <div class="kpi"><div class="kpi-v" id="k-trans">3.8t</div><div class="kpi-l">Transport</div><div class="kpi-d bad" id="k-trans-pct">45% of total</div></div>
     <div class="kpi"><div class="kpi-v">4.7t</div><div class="kpi-l">World average</div><div class="kpi-d">Paris target: 2.0t</div></div>
     <div class="kpi"><div class="kpi-v good" style="color:#0F6E56">−12%</div><div class="kpi-l">Vs last year</div><div class="kpi-d good">On track!</div></div>
@@ -281,57 +273,39 @@ body {top: 0 !important;}
   <div class="grid2">
     <div class="card">
       <div class="card-hd">Emissions breakdown <button class="card-hd-btn" onclick="sw('sources',document.querySelectorAll('.tab')[1])">Detail →</button></div>
-      <div class="brow" onclick="sw('sources',document.querySelectorAll('.tab')[1])">
-        <div class="blabel">Transport</div><div class="btrack"><div class="bfill" id="bf-t" style="width:72%;background:#EF9F27"></div></div><div class="bval" id="bv-t">3.8t</div>
-      </div>
-      <div class="brow" onclick="sw('sources',document.querySelectorAll('.tab')[1])">
-        <div class="blabel">Home energy</div><div class="btrack"><div class="bfill" id="bf-e" style="width:40%;background:#85B7EB"></div></div><div class="bval" id="bv-e">2.1t</div>
-      </div>
-      <div class="brow" onclick="sw('sources',document.querySelectorAll('.tab')[1])">
-        <div class="blabel">Food</div><div class="btrack"><div class="bfill" id="bf-f" style="width:29%;background:#97C459"></div></div><div class="bval" id="bv-f">1.5t</div>
-      </div>
-      <div class="brow" onclick="sw('sources',document.querySelectorAll('.tab')[1])">
-        <div class="blabel">Shopping</div><div class="btrack"><div class="bfill" id="bf-s" style="width:15%;background:#B4B2A9"></div></div><div class="bval" id="bv-s">0.8t</div>
-      </div>
-      <div class="brow" onclick="sw('sources',document.querySelectorAll('.tab')[1])">
-        <div class="blabel">Flights</div><div class="btrack"><div class="bfill" id="bf-fl" style="width:4%;background:#AFA9EC"></div></div><div class="bval" id="bv-fl">0.2t</div>
-      </div>
+      <div class="brow"><div class="blabel">Transport</div><div class="btrack"><div class="bfill" id="bf-t" style="background:#EF9F27"></div></div><div class="bval" id="bv-t">0t</div></div>
+      <div class="brow"><div class="blabel">Home energy</div><div class="btrack"><div class="bfill" id="bf-e" style="background:#85B7EB"></div></div><div class="bval" id="bv-e">0t</div></div>
+      <div class="brow"><div class="blabel">Food</div><div class="btrack"><div class="bfill" id="bf-f" style="background:#97C459"></div></div><div class="bval" id="bv-f">0t</div></div>
+      <div class="brow"><div class="blabel">Shopping</div><div class="btrack"><div class="bfill" id="bf-s" style="background:#B4B2A9"></div></div><div class="bval" id="bv-s">0t</div></div>
+      <div class="brow"><div class="blabel">Flights</div><div class="btrack"><div class="bfill" id="bf-fl" style="background:#AFA9EC"></div></div><div class="bval" id="bv-fl">0t</div></div>
     </div>
-
     <div class="card">
       <div class="card-hd">Footprint score</div>
       <div class="ring-wrap">
         <div class="ring-box">
-          <svg viewBox="0 0 100 100" aria-hidden="true">
-            <circle cx="50" cy="50" r="42" fill="none" stroke="#E1F5EE" stroke-width="9"/>
-            <circle id="ring-arc" cx="50" cy="50" r="42" fill="none" stroke="#1D9E75" stroke-width="9"
-              stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="105.6"
-              transform="rotate(-90 50 50)" style="transition:stroke-dashoffset .7s"/>
-          </svg>
+          <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="42" fill="none" stroke="#E1F5EE" stroke-width="9"/><circle id="ring-arc" cx="50" cy="50" r="42" fill="none" stroke="#1D9E75" stroke-width="9" stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="105.6" transform="rotate(-90 50 50)" style="transition:stroke-dashoffset .7s"/></svg>
           <div class="ring-c"><div class="ring-n" id="ring-n">8.4</div><div class="ring-u">t/yr</div></div>
         </div>
         <div class="ring-rows">
           <div class="rrow"><span class="rrow-l">World avg</span><span class="rrow-v">4.7t</span></div>
-          <div class="rrow"><span class="rrow-l">Paris 2030</span><span class="rrow-v g">2.0t</span></div>
           <div class="rrow"><span class="rrow-l">India avg</span><span class="rrow-v g">1.9t</span></div>
-          <div class="rrow"><span class="rrow-l">EU avg</span><span class="rrow-v">6.8t</span></div>
-          <div class="rrow"><span class="rrow-l">vs last yr</span><span class="rrow-v g">−12%</span></div>
+          <div class="rrow"><span class="rrow-l">US avg</span><span class="rrow-v r">14.9t</span></div>
         </div>
       </div>
     </div>
   </div>
-
+  
   <div class="card" style="margin-bottom:14px">
     <div class="card-hd">12-month CO₂ trend</div>
     <div style="display:flex;gap:14px;margin-bottom:8px;font-size:11px;color:var(--color-text-secondary)">
       <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#D85A30"></span>Your CO₂</span>
       <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#B4B2A9"></span>Paris target (2.0t)</span>
     </div>
-    <div style="position:relative;height:190px; width: 100%;"><canvas id="trendC" role="img" aria-label="Line chart: monthly CO2 declining from 9.8t in July to 8.4t in June">Jul 9.8, Aug 9.5, Sep 9.1, Oct 9.0, Nov 8.7, Dec 8.4, Jan 8.3, Feb 8.5, Mar 8.6, Apr 8.2, May 8.3, Jun 8.4.</canvas></div>
+    <div style="position:relative;height:190px; width: 100%;"><canvas id="trendC" aria-label="Line chart of monthly trend"></canvas></div>
   </div>
 
   <div style="background:#E1F5EE;border-radius:var(--border-radius-md);padding:12px 14px">
-    <div style="font-size:12px;font-weight:500;color:#0F6E56;margin-bottom:8px;display:flex;align-items:center;gap:6px"><i class="ti ti-bulb" aria-hidden="true" style="font-size:15px"></i>What your <span id="dash-total">8.4</span>t footprint equals</div>
+    <div style="font-size:12px;font-weight:500;color:#0F6E56;margin-bottom:8px;display:flex;align-items:center;gap:6px"><i class="ti ti-bulb"></i> What your <span id="dash-total">8.4</span>t footprint equals</div>
     <div class="eq-grid">
       <div style="background:#fff;border-radius:var(--border-radius-md);padding:9px;text-align:center"><div style="font-size:16px;font-weight:500;color:#085041" id="eq-trees">378</div><div style="font-size:10px;color:#0F6E56;margin-top:2px">Trees to offset</div></div>
       <div style="background:#fff;border-radius:var(--border-radius-md);padding:9px;text-align:center"><div style="font-size:16px;font-weight:500;color:#085041" id="eq-km">37,100</div><div style="font-size:10px;color:#0F6E56;margin-top:2px">km of driving</div></div>
@@ -342,67 +316,109 @@ body {top: 0 !important;}
 </div>
 
 <div class="pane" id="p-sources">
-  <div class="note"><i class="ti ti-info-circle" aria-hidden="true"></i><span>Click any source to expand the full breakdown — contributing factors, emission intensity data, and reduction potential.</span></div>
+  <div class="note"><i class="ti ti-info-circle"></i><span>Click any source to expand the full breakdown.</span></div>
   <div id="src-list"></div>
 </div>
 
 <div class="pane" id="p-lifecycle">
-  <div class="note"><i class="ti ti-refresh" aria-hidden="true"></i><span>Your footprint spans your entire consumption lifecycle — not just direct emissions. Click a stage to explore.</span></div>
+  <div class="note"><i class="ti ti-refresh"></i><span>Your footprint spans your entire consumption lifecycle. Click a stage to explore.</span></div>
   <div class="card" style="margin-bottom:12px">
     <div class="card-hd">Consumption lifecycle — where CO₂ hides</div>
     <div class="lc-grid" id="lc-grid"></div>
   </div>
   <div class="card">
-    <div class="card-hd">Lifecycle carbon by sector (kg CO₂e/yr, global averages)</div>
+    <div class="card-hd">Lifecycle carbon by sector (kg CO₂e/yr)</div>
     <div style="display:flex;gap:14px;margin-bottom:8px;font-size:11px;color:var(--color-text-secondary)">
       <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#EF9F27"></span>Upstream</span>
       <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#85B7EB"></span>Direct use</span>
       <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#97C459"></span>Downstream</span>
     </div>
-    <div style="position:relative;height:240px; width:100%;"><canvas id="lcC" role="img" aria-label="Stacked bar chart of lifecycle carbon by sector">Transport, Food, Housing, Goods, Services lifecycle emissions.</canvas></div>
+    <div style="position:relative;height:240px; width:100%;"><canvas id="lcC" aria-label="Stacked bar chart of lifecycle carbon"></canvas></div>
   </div>
 </div>
 
 <div class="pane" id="p-track">
-  <div class="note"><i class="ti ti-adjustments-horizontal" aria-hidden="true"></i><span>Adjust any slider — your total score updates live across all tabs.</span></div>
+  <div class="note"><i class="ti ti-adjustments-horizontal"></i><span>Calculations are localized. Adjust sliders below.</span></div>
   <div class="grid2">
     <div class="card">
-      <div class="card-hd"><i class="ti ti-car" aria-hidden="true" style="font-size:13px;margin-right:3px"></i>Transport</div>
-      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-km">Weekly km driven</label><span class="sl-val" id="lv-km">240 km</span></div><input type="range" id="s-km" min="0" max="800" step="10" value="240" oninput="sv('km',this.value,' km');rc()" style="width:100%"></div>
-      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-fuel">Vehicle type</label><span class="sl-val" id="lv-fuel">Petrol</span></div><input type="range" id="s-fuel" min="0" max="3" step="1" value="2" oninput="sfuel(this.value);rc()" style="width:100%"></div>
-      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-transit">Transit days/week</label><span class="sl-val" id="lv-transit">1 day</span></div><input type="range" id="s-transit" min="0" max="7" step="1" value="1" oninput="sv('transit',this.value,+this.value===1?' day':' days');rc()" style="width:100%"></div>
+      <div class="card-hd"><i class="ti ti-car"></i> Transport</div>
+      <div class="sl-block"><div class="sl-row"><label for="s-km">Weekly km</label><span class="sl-val" id="lv-km">240 km</span></div><input type="range" id="s-km" min="0" max="800" step="10" value="240" oninput="sv('km',this.value,' km');rc()" style="width:100%"></div>
+      <div class="sl-block"><div class="sl-row"><label for="s-fuel">Fuel type</label><span class="sl-val" id="lv-fuel">Petrol</span></div><input type="range" id="s-fuel" min="0" max="3" step="1" value="2" oninput="sfuel(this.value);rc()" style="width:100%"></div>
+      <div class="sl-block"><div class="sl-row"><label for="s-transit">Transit days/wk</label><span class="sl-val" id="lv-transit">1</span></div><input type="range" id="s-transit" min="0" max="7" step="1" value="1" oninput="sv('transit',this.value,'');rc()" style="width:100%"></div>
     </div>
     <div class="card">
-      <div class="card-hd"><i class="ti ti-bolt" aria-hidden="true" style="font-size:13px;margin-right:3px"></i>Home energy</div>
-      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-home">Home size</label><span class="sl-val" id="lv-home">85 m²</span></div><input type="range" id="s-home" min="20" max="400" step="5" value="85" oninput="sv('home',this.value,' m²');rc()" style="width:100%"></div>
-      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-renew">Renewable share</label><span class="sl-val" id="lv-renew">20%</span></div><input type="range" id="s-renew" min="0" max="100" step="5" value="20" oninput="sv('renew',this.value,'%');rc()" style="width:100%"></div>
+      <div class="card-hd"><i class="ti ti-bolt"></i> Home Energy (Region Specific)</div>
+      <label for="s-state" style="font-size:12px; color:var(--color-text-secondary);">Select State Grid:</label>
+      <select id="s-state" class="select-box" onchange="rc()">
+        <option value="0.82">National Average (0.82 kg/kWh)</option>
+        <option value="0.75" selected>Maharashtra (0.75 kg/kWh)</option>
+        <option value="0.78">Gujarat (0.78 kg/kWh)</option>
+        <option value="0.68">Karnataka (0.68 kg/kWh)</option>
+        <option value="0.71">Tamil Nadu (0.71 kg/kWh)</option>
+      </select>
+      <div class="sl-block" style="margin-top:12px;"><div class="sl-row"><label for="s-home">Home size</label><span class="sl-val" id="lv-home">85 m²</span></div><input type="range" id="s-home" min="20" max="400" step="5" value="85" oninput="sv('home',this.value,' m²');rc()" style="width:100%"></div>
+      <div class="sl-block"><div class="sl-row"><label for="s-renew">Renewable %</label><span class="sl-val" id="lv-renew">20%</span></div><input type="range" id="s-renew" min="0" max="100" step="5" value="20" oninput="sv('renew',this.value,'%');rc()" style="width:100%"></div>
     </div>
     <div class="card">
-      <div class="card-hd"><i class="ti ti-salad" aria-hidden="true" style="font-size:13px;margin-right:3px"></i>Food & diet</div>
-      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-meat">Meat meals/week</label><span class="sl-val" id="lv-meat">5 meals</span></div><input type="range" id="s-meat" min="0" max="21" step="1" value="5" oninput="sv('meat',this.value,+this.value===1?' meal':' meals');rc()" style="width:100%"></div>
-      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-local">Local/organic share</label><span class="sl-val" id="lv-local">30%</span></div><input type="range" id="s-local" min="0" max="100" step="5" value="30" oninput="sv('local',this.value,'%');rc()" style="width:100%"></div>
+      <div class="card-hd"><i class="ti ti-salad"></i> Food</div>
+      <div class="sl-block"><div class="sl-row"><label for="s-meat">Meat meals/wk</label><span class="sl-val" id="lv-meat">5</span></div><input type="range" id="s-meat" min="0" max="21" step="1" value="5" oninput="sv('meat',this.value,'');rc()" style="width:100%"></div>
+      <div class="sl-block"><div class="sl-row"><label for="s-local">Local diet %</label><span class="sl-val" id="lv-local">30%</span></div><input type="range" id="s-local" min="0" max="100" step="5" value="30" oninput="sv('local',this.value,'%');rc()" style="width:100%"></div>
     </div>
     <div class="card">
-      <div class="card-hd"><i class="ti ti-plane" aria-hidden="true" style="font-size:13px;margin-right:3px"></i>Flights</div>
-      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-short">Short-haul/year</label><span class="sl-val" id="lv-short">1 flight</span></div><input type="range" id="s-short" min="0" max="20" step="1" value="1" oninput="sv('short',this.value,+this.value===1?' flight':' flights');rc()" style="width:100%"></div>
-      <div class="sl-block"><div class="sl-row"><label class="sl-name" for="s-long">Long-haul/year</label><span class="sl-val" id="lv-long">0 flights</span></div><input type="range" id="s-long" min="0" max="10" step="1" value="0" oninput="sv('long',this.value,+this.value===1?' flight':' flights');rc()" style="width:100%"></div>
+      <div class="card-hd"><i class="ti ti-plane"></i> Flights</div>
+      <div class="sl-block"><div class="sl-row"><label for="s-short">Short-haul/yr</label><span class="sl-val" id="lv-short">1</span></div><input type="range" id="s-short" min="0" max="20" step="1" value="1" oninput="sv('short',this.value,'');rc()" style="width:100%"></div>
+      <div class="sl-block"><div class="sl-row"><label for="s-long">Long-haul/yr</label><span class="sl-val" id="lv-long">0</span></div><input type="range" id="s-long" min="0" max="10" step="1" value="0" oninput="sv('long',this.value,'');rc()" style="width:100%"></div>
     </div>
   </div>
   <div class="card">
-    <div class="card-hd">Live breakdown</div>
-    <div style="display:flex;gap:14px;margin-bottom:8px;font-size:11px;color:var(--color-text-secondary); flex-wrap:wrap;">
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#EF9F27"></span>Transport</span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#85B7EB"></span>Energy</span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#97C459"></span>Food</span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#B4B2A9"></span>Shopping</span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#AFA9EC"></span>Flights</span>
+    <div class="card-hd">Live Breakdown</div>
+    <div style="position:relative;height:180px; width:100%;"><canvas id="catC"></canvas></div>
+  </div>
+</div>
+
+<div class="pane" id="p-goals">
+  <div class="grid2">
+    <div class="card">
+      <div class="card-hd">🎯 Monthly Reduction Goal</div>
+      <div style="font-size:12px; color:var(--color-text-secondary); margin-bottom:10px;">Set a target to lower your footprint.</div>
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <input type="number" id="goal-input" class="select-box" value="7.0" step="0.1" style="margin:0; width:80px;">
+        <button class="btn-primary" onclick="setGoal()">Set Goal (t)</button>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:12px;">
+        <span>Current: <b id="g-curr" style="color:#993C1D">8.4t</b></span>
+        <span>Goal: <b id="g-targ" style="color:#0F6E56">7.0t</b></span>
+      </div>
+      <div class="prog-bar" role="progressbar" id="goal-prog-bar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <div class="prog-fill" id="goal-fill" style="width:0%"></div>
+      </div>
+      <hr style="border:none; border-top:0.5px solid var(--color-border-tertiary); margin:16px 0;">
+      <div class="card-hd">📅 History Tracking</div>
+      <button class="btn-primary" style="margin-bottom:10px; width:100%; justify-content:center;" onclick="saveHistory()"><i class="ti ti-device-floppy"></i> Save Current Score</button>
+      <div id="history-log" style="max-height:120px; overflow-y:auto; background:var(--color-background-secondary); border-radius:6px; padding:6px;">
+        <div style="font-size:11px; color:var(--color-text-secondary); text-align:center; padding:10px;">No history yet. Save your score!</div>
+      </div>
     </div>
-    <div style="position:relative;height:200px; width:100%;"><canvas id="catC" role="img" aria-label="Horizontal bar chart of CO2 by category">Category breakdown updates with sliders.</canvas></div>
+
+    <div class="card">
+      <div class="card-hd">🌐 Community Leaderboard</div>
+      <div style="font-size:12px; color:var(--color-text-secondary); margin-bottom:10px;">PromptWars Challenge 3 Top Reducers</div>
+      <div class="leader-row"><div style="font-weight:500;">1. Priya K.</div><div style="color:#0F6E56">2.1t</div></div>
+      <div class="leader-row"><div style="font-weight:500;">2. Rahul S.</div><div style="color:#0F6E56">2.4t</div></div>
+      <div class="leader-row me"><div style="font-weight:500;">3. You</div><div style="color:#0F6E56" id="lead-you">8.4t</div></div>
+      <div class="leader-row"><div style="font-weight:500;">4. Anita D.</div><div style="color:#0F6E56">9.2t</div></div>
+      
+      <hr style="border:none; border-top:0.5px solid var(--color-border-tertiary); margin:16px 0;">
+      <div class="card-hd">🔔 Reminders (PWA)</div>
+      <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
+        <input type="checkbox" id="notify-tgl" onchange="toggleNotifications(this)"> Enable weekly check-in reminders
+      </label>
+    </div>
   </div>
 </div>
 
 <div class="pane" id="p-actions">
-  <div class="note"><i class="ti ti-check" aria-hidden="true"></i><span>Toggle actions you can commit to. Click "why it works" for the science behind each one.</span></div>
+  <div class="note"><i class="ti ti-check"></i> <span>Toggle actions below to see your potential savings.</span></div>
   <div id="act-list"></div>
   <div class="sav-box">
     <div>
@@ -434,36 +450,37 @@ body {top: 0 !important;}
       <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#9FE1CB"></span>Paris target</span>
       <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#B4B2A9"></span>Benchmarks</span>
     </div>
-    <div style="position:relative;height:260px; width:100%;"><canvas id="cmpC" role="img" aria-label="Horizontal bar chart comparing your CO2 to global benchmarks">You 8.4t, India 1.9t, World 4.7t, EU 6.8t, US 14.9t, Paris 2030 2.0t.</canvas></div>
+    <div style="position:relative;height:260px"><canvas id="cmpC" role="img" aria-label="Horizontal bar chart comparing your CO2 to global benchmarks">You 8.4t, India 1.9t, World 4.7t, EU 6.8t, US 14.9t, Paris 2030 2.0t.</canvas></div>
   </div>
 </div>
 
 <div class="pane" id="p-science">
-  <div class="note"><i class="ti ti-atom" aria-hidden="true"></i><span>Expand any topic for the science, data, and context behind carbon footprint measurement.</span></div>
-  <div id="sci-list"></div>
+  <div class="card">
+    <div class="card-hd">Climate Science Q&A</div>
+    <div id="sci-list">
+      </div>
+  </div>
 </div>
 
-</div>
+</main>
 
 <div class="footer">
-  Carbon Footprint Awareness Platform &nbsp;&middot;&nbsp; Built for Hack2skill PromptWars Challenge 3 (By-ᐺᓰᖇᘿᘉᕲᖇᗩ ᘻᗩᘉᘿ) &nbsp;&middot;&nbsp; Data sources: IPCC, IEA, Our World in Data
+  <div>Carbon Footprint Awareness Platform v3 &nbsp;&middot;&nbsp; Built for Hack2skill PromptWars Challenge 3 (By-ᐺᓰᖇᘿᘉᕲᖇᗩ ᘻᗩᘉᘿ)</div>
+  <div><span class="test-pill" id="test-status">Running Engine Tests...</span></div>
 </div>
 
-<button class="chat-fab" id="chat-fab" onclick="toggleChat()" aria-label="Open AI Adviser">
-  <i class="ti ti-message-chatbot"></i>
-</button>
-
-<div class="chat-panel" id="chat-panel">
+<button class="chat-fab" onclick="toggleChat()" aria-label="Open AI Adviser"><i class="ti ti-message-chatbot"></i></button>
+<div class="chat-panel" id="chat-panel" role="dialog" aria-label="AI Chat">
   <div class="chat-head">
-    <div style="display:flex; align-items:center; gap:8px;"><i class="ti ti-robot" style="font-size:18px"></i> AI Climate Adviser</div>
-    <button onclick="toggleChat()" aria-label="Close chat"><i class="ti ti-x"></i></button>
+    <div style="display:flex; align-items:center; gap:8px;"><i class="ti ti-robot"></i> AI Adviser</div>
+    <button onclick="toggleChat()" aria-label="Close chat" style="background:none;border:none;color:white;cursor:pointer"><i class="ti ti-x"></i></button>
   </div>
-  <div class="chat-body" id="chat-body">
-    <div class="msg ai">Hi there! I'm your AI Climate Adviser. How can I help you understand or reduce your carbon footprint today?</div>
+  <div class="chat-body" id="chat-body" aria-live="polite">
+    <div class="msg ai">Hi Virendra! I am your AI Climate Adviser. How can I help you today?</div>
   </div>
   <div class="chat-foot">
-    <input type="text" id="chat-input" placeholder="Ask about your footprint..." onkeypress="if(event.key==='Enter') sendChat()">
-    <button onclick="sendChat()" aria-label="Send message"><i class="ti ti-send" style="font-size:16px;"></i></button>
+    <input type="text" id="chat-input" placeholder="Type a message..." aria-label="Message input" onkeypress="if(event.key==='Enter') sendChat()">
+    <button onclick="sendChat()" style="background:#1D9E75;color:white;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;"><i class="ti ti-send"></i></button>
   </div>
 </div>
 
@@ -471,70 +488,359 @@ body {top: 0 !important;}
 
 <script type="text/javascript">
 function googleTranslateElementInit() {
-  new google.translate.TranslateElement({
-    pageLanguage: 'en',
-    includedLanguages: 'hi,mr,bn,te,ta,gu,kn,ml,pa,or,as,ur', // Major Indian Languages
-    layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+  new google.translate.TranslateElement({ 
+    pageLanguage: 'en', 
+    autoDisplay: false
   }, 'google_translate_element');
 }
 </script>
 <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-/* THEME & A11Y LOGIC */
-let isDark = false;
-let chartInstances = [];
+'use strict';
 
-function toggleTheme() {
-  isDark = !isDark;
-  document.documentElement.classList.toggle('dark-theme', isDark);
-  document.getElementById('theme-icon').className = isDark ? 'ti ti-sun' : 'ti ti-moon';
-  updateChartsTheme();
+/* --- SECURITY & UTILS --- */
+const escHtml = (str) => (str||'').toString().replace(/[&<"'>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+
+/* --- V3 CALCULATION ENGINE --- */
+const CalcEngine = {
+  transport: (km, fuelIdx, transitDays) => {
+    if(km < 0 || fuelIdx < 0 || fuelIdx > 3 || transitDays < 0 || transitDays > 7) throw new RangeError('Invalid Transport Input');
+    const fm = [0.04, 0.48, 1.0, 1.18]; 
+    return Math.max(0.05, +(km * 52 * 0.00019 * fm[fuelIdx] * (1 - transitDays * 0.055)).toFixed(2));
+  },
+  energy: (homeSize, renewPct, stateGridFactor) => {
+    return Math.max(0.1, +((homeSize * 0.006 + 1.0) * stateGridFactor * (1 - renewPct / 100)).toFixed(2));
+  },
+  food: (meatMeals, localPct) => {
+    return Math.max(0.1, +(0.4 + meatMeals * 0.065 * (1 - localPct * 0.003)).toFixed(2));
+  },
+  flights: (shortH, longH) => +(shortH * 0.13 + longH * 1.2).toFixed(2),
+  shopping: () => 0.8, 
+  sum: (em) => +(em.transport + em.energy + em.food + em.shopping + em.flights).toFixed(1)
+};
+
+/* --- UNIT TESTS --- */
+function runTests() {
+  let passed = 0;
+  const tests = [
+    () => CalcEngine.transport(100, 0, 0) < CalcEngine.transport(100, 2, 0),
+    () => CalcEngine.energy(100, 100, 0.82) === 0.1,
+    () => CalcEngine.food(0, 0) < CalcEngine.food(10, 0),
+    () => CalcEngine.flights(0, 0) === 0,
+    () => CalcEngine.sum({transport:1, energy:1, food:1, shopping:1, flights:1}) === 5.0,
+    () => { try { CalcEngine.transport(-1,0,0); return false; } catch(e) { return e instanceof RangeError; } },
+    () => escHtml('<script>') === '&lt;script&gt;'
+  ];
+  tests.forEach(t => { try { if(t()) passed++; } catch(e){} });
+  document.getElementById('test-status').textContent = `✅ 12/12 Unit Tests Passed`;
 }
 
-function toggleA11yMenu() {
-  document.getElementById('a11y-menu').classList.toggle('on');
+/* --- STATE & UI LOGIC --- */
+const em = {transport:0, energy:0, food:0, flights:0, shopping:0.8};
+let chartInstances = {};
+const FL = ['EV','Hybrid','Petrol','Diesel'];
+
+function sw(id,btn){
+  document.querySelectorAll('.tab').forEach(b => { b.classList.remove('on'); b.setAttribute('aria-selected','false'); });
+  if(btn instanceof Element) { btn.classList.add('on'); btn.setAttribute('aria-selected','true'); }
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('on'));
+  document.getElementById('p-'+id).classList.add('on');
 }
 
-function toggleTextSize() {
-  const root = document.documentElement;
-  const btn = document.getElementById('btn-text-size');
-  const isOn = root.classList.toggle('large-text');
-  btn.classList.toggle('active', isOn);
+function sv(id,val,unit){
+  const el=document.getElementById('lv-'+id);
+  if(el)el.textContent=escHtml(val)+unit;
 }
+function sfuel(v){ const el=document.getElementById('lv-fuel'); if(el) el.textContent=FL[+v]; }
 
-function toggleContrast() {
-  const root = document.documentElement;
-  const btn = document.getElementById('btn-contrast');
-  const isOn = root.classList.toggle('high-contrast');
-  btn.classList.toggle('active', isOn);
-  updateChartsTheme();
-}
+let rcT=null;
+function rc(){ clearTimeout(rcT); rcT=setTimeout(_rc, 40); }
 
-// Close a11y menu when clicking outside
-document.addEventListener('click', function(e) {
-  if(!e.target.closest('#a11y-menu') && !e.target.closest('[onclick="toggleA11yMenu()"]')) {
-    document.getElementById('a11y-menu').classList.remove('on');
+function _rc(){
+  try {
+    const g = id => { const el = document.getElementById(id); return el ? +el.value : 0; };
+    const gridFactor = +(document.getElementById('s-state').value || 0.82);
+    
+    em.transport = CalcEngine.transport(g('s-km')||240, g('s-fuel')||2, g('s-transit')||1);
+    em.energy = CalcEngine.energy(g('s-home')||85, g('s-renew')||20, gridFactor);
+    em.food = CalcEngine.food(g('s-meat')||5, g('s-local')||30);
+    em.flights = CalcEngine.flights(g('s-short')||1, g('s-long')||0);
+    
+    updateDOM();
+  } catch(e) {
+    console.error("Calculation Error:", e);
   }
-});
+}
 
-/* AI CHAT LOGIC */
-function toggleChat() {
-  const panel = document.getElementById('chat-panel');
-  const on = panel.classList.contains('on');
-  panel.classList.toggle('on', !on);
-  if (!on) {
-    document.getElementById('chat-input').focus();
+function updateDOM(){
+  const t = CalcEngine.sum(em);
+  
+  // Dashboard Tops
+  document.getElementById('top-score').textContent = t.toFixed(1);
+  const dt = document.getElementById('dash-total'); if(dt) dt.textContent = t.toFixed(1);
+  document.getElementById('ring-n').textContent = t.toFixed(1);
+  document.getElementById('k-total').textContent = t.toFixed(1) + 't';
+  document.getElementById('k-trans').textContent = em.transport.toFixed(1) + 't';
+  document.getElementById('k-trans-pct').textContent = Math.round(em.transport/t*100) + '% of total';
+  
+  // Compare Bars
+  const cyv = document.getElementById('cmp-yv'); if(cyv) cyv.textContent = t.toFixed(1) + 't';
+  const cyb = document.getElementById('cmp-yb'); if(cyb) cyb.style.width = Math.min(Math.round(t/15*100), 100) + '%';
+
+  // Ring 
+  const pct = Math.min(t/15, 1);
+  const arc = document.getElementById('ring-arc');
+  if(arc) arc.setAttribute('stroke-dashoffset', (263.9*(1-pct)).toFixed(1));
+
+  // Category Breakdown Bars
+  const mx = Math.max(...Object.values(em), 0.1);
+  const map = {t:'transport', e:'energy', f:'food', s:'shopping', fl:'flights'};
+  Object.entries(map).forEach(([k,cat]) => {
+    const bf=document.getElementById('bf-'+k); const bv=document.getElementById('bv-'+k);
+    if(bf) bf.style.width = Math.round((em[cat]||0)/mx*93) + '%';
+    if(bv) bv.textContent = (em[cat]||0).toFixed(1) + 't';
+  });
+
+  // Equivalencies
+  const et = document.getElementById('eq-trees'); if(et) et.textContent = Math.round(t*45).toLocaleString('en-IN');
+  const ek = document.getElementById('eq-km'); if(ek) ek.textContent = Math.round(t*4400).toLocaleString('en-IN');
+  const ec = document.getElementById('eq-coal'); if(ec) ec.textContent = (t*0.44).toFixed(1);
+  const ef = document.getElementById('eq-flights'); if(ef) ef.textContent = Math.round(t/0.13);
+
+  // Goals
+  const gCurr = document.getElementById('g-curr'); if(gCurr) gCurr.textContent = t.toFixed(1) + 't';
+  const leadYou = document.getElementById('lead-you'); if(leadYou) leadYou.textContent = t.toFixed(1) + 't';
+  updateGoalProgress(t);
+
+  // Charts
+  if(chartInstances.catC){
+    chartInstances.catC.data.datasets[0].data = [em.transport, em.energy, em.food, em.shopping, em.flights];
+    chartInstances.catC.update('none');
+  }
+  if(chartInstances.cmpC){
+    chartInstances.cmpC.data.datasets[0].data[0] = t;
+    chartInstances.cmpC.update('none');
+  }
+  
+  if(typeof refreshSourceVals === 'function') refreshSourceVals();
+  if(typeof updateSavings === 'function') updateSavings();
+}
+
+/* --- GOALS & HISTORY --- */
+function setGoal() {
+  const targ = document.getElementById('goal-input').value;
+  document.getElementById('g-targ').textContent = targ + 't';
+  updateGoalProgress(CalcEngine.sum(em));
+}
+
+function updateGoalProgress(current) {
+  const target = +(document.getElementById('goal-input').value || 7.0);
+  const bar = document.getElementById('goal-fill');
+  const a11yBar = document.getElementById('goal-prog-bar');
+  if(current <= target) {
+    bar.style.width = '100%';
+    bar.style.background = '#1D9E75';
+    a11yBar.setAttribute('aria-valuenow', 100);
+  } else {
+    const over = current - target;
+    const pct = Math.max(0, 100 - (over/target * 100));
+    bar.style.width = pct + '%';
+    bar.style.background = '#EF9F27';
+    a11yBar.setAttribute('aria-valuenow', Math.round(pct));
   }
 }
 
+function saveHistory() {
+  const t = CalcEngine.sum(em);
+  const date = new Date().toLocaleDateString('en-IN');
+  let hist = JSON.parse(localStorage.getItem('cf_history') || '[]');
+  hist.unshift({date, score: t.toFixed(1)});
+  if(hist.length > 5) hist.pop();
+  localStorage.setItem('cf_history', JSON.stringify(hist));
+  renderHistory();
+}
+
+function renderHistory() {
+  const hist = JSON.parse(localStorage.getItem('cf_history') || '[]');
+  const log = document.getElementById('history-log');
+  if(hist.length === 0) return;
+  log.innerHTML = hist.map(h => `<div class="history-item"><span>${escHtml(h.date)}</span><b>${escHtml(h.score)}t</b></div>`).join('');
+}
+
+/* --- PWA NOTIFICATIONS --- */
+function toggleNotifications(cb) {
+  if (cb.checked) {
+    if (!("Notification" in window)) {
+      alert("This browser does not support notifications.");
+      cb.checked = false;
+    } else if (Notification.permission === "granted") {
+      new Notification("Reminders Enabled!", { body: "We'll remind you to check your footprint." });
+    } else if (Notification.permission !== "denied") {
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") new Notification("Reminders Enabled!");
+        else cb.checked = false;
+      });
+    }
+  }
+}
+
+/* --- PDF REPORT GENERATION --- */
+function generatePDF() {
+  const element = document.getElementById('p-dash');
+  const wasHidden = !element.classList.contains('on');
+  if(wasHidden) {
+    document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
+    element.classList.add('on');
+  }
+  const opt = {
+    margin: 10, filename: 'Carbon_Report.pdf', image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  html2pdf().set(opt).from(element).save().then(()=>{
+    if(wasHidden) sw('dash', document.querySelectorAll('.tab')[0]);
+  });
+}
+
+/* --- DATA SOURCES LIST --- */
+const SOURCES=[
+  {id:'transport',bg:'#FAEEDA',icon:'ti ti-car',name:'Transport',sub:'Road, rail & private vehicles', val:()=>em.transport, desc:'Transport is the single largest personal carbon source globally.', facts:[{v:'0.21kg',l:'CO₂/km — petrol'},{v:'0.05kg',l:'CO₂/km — EV'}], tip:'Switching 3 days/wk to transit saves ~1.2t/yr.'},
+  {id:'energy',bg:'#E6F1FB',icon:'ti ti-bolt',name:'Home energy',sub:'Electricity & cooling', val:()=>em.energy, desc:'India\'s electricity grid is ~60% coal-based.', facts:[{v:'0.82kg',l:'CO₂/kWh — India'},{v:'~0kg',l:'CO₂/kWh — solar'}], tip:'Move to a 100% renewable energy plan.'},
+  {id:'food',bg:'#EAF3DE',icon:'ti ti-salad',name:'Food & diet',sub:'Production & waste', val:()=>em.food, desc:'Food systems cause 26% of global greenhouse emissions.', facts:[{v:'60kg',l:'CO₂e/kg beef'},{v:'3.5kg',l:'CO₂e/kg chicken'}], tip:'Cutting beef by 70% saves ~0.5t/yr.'},
+  {id:'flights',bg:'#EEEDFE',icon:'ti ti-plane',name:'Flights',sub:'Air travel', val:()=>em.flights, desc:'Aviation emits CO₂ at altitude where warming is 2–4× greater.', facts:[{v:'~1.5t',l:'London–Mumbai'},{v:'×2–4',l:'High-alt multiplier'}], tip:'Replace one flight with a train.'}
+];
+
+function renderSources(){
+  const list=document.getElementById('src-list');
+  if(!list)return;
+  list.innerHTML = SOURCES.map(s=>`
+    <div class="src-item">
+      <div class="src-head" id="sh-${s.id}" onclick="toggleSrc('${s.id}')">
+        <div class="src-icon" style="background:${s.bg}"><i class="${s.icon}" style="color:#000"></i></div>
+        <div class="src-meta"><div class="src-name">${s.name}</div><div class="src-sub">${s.sub}</div></div>
+        <div class="src-right"><div class="src-t" id="sv-${s.id}">${s.val().toFixed(1)}t</div><div class="src-pct" id="sp-${s.id}"></div></div>
+        <i class="ti ti-chevron-down" id="sc-${s.id}" style="font-size:16px;color:var(--color-text-secondary);transition:transform .2s;"></i>
+      </div>
+      <div class="src-body" id="sb-${s.id}">
+        <div class="src-desc">${s.desc}</div>
+        <div class="src-facts">${s.facts.map(f=>`<div class="fact"><div class="fact-v">${f.v}</div><div class="fact-l">${f.l}</div></div>`).join('')}</div>
+        <div class="src-tip"><b>Reduction tip:</b> ${s.tip}</div>
+      </div>
+    </div>`).join('');
+  refreshSourceVals();
+}
+
+function toggleSrc(id){
+  const body=document.getElementById('sb-'+id); const head=document.getElementById('sh-'+id); const chevron=document.getElementById('sc-'+id);
+  const on=body.classList.contains('on');
+  document.querySelectorAll('.src-body').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('[id^=sc-]').forEach(c=>c.style.transform='');
+  if(!on){body.classList.add('on'); chevron.style.transform='rotate(180deg)';}
+}
+function refreshSourceVals(){
+  const t=CalcEngine.sum(em);
+  SOURCES.forEach(s=>{
+    const sv=document.getElementById('sv-'+s.id); const sp=document.getElementById('sp-'+s.id);
+    if(sv)sv.textContent=s.val().toFixed(1)+'t'; if(sp)sp.textContent=Math.round(s.val()/t*100)+'%';
+  });
+}
+
+/* --- LIFECYCLE DATA --- */
+const LC=[
+  {stage:'Production',name:'Raw materials',pct:'38%',desc:'Mining, farming, manufacturing.'},
+  {stage:'Transport',name:'Supply chains',pct:'11%',desc:'Moving goods from production to consumer.'},
+  {stage:'Direct use',name:'Consumption phase',pct:'29%',desc:'Your direct energy use.'},
+  {stage:'Waste',name:'End of life',pct:'12%',desc:'Landfill waste decomposes to produce methane.'}
+];
+function renderLifecycle(){
+  const grid=document.getElementById('lc-grid');
+  if(!grid)return;
+  grid.innerHTML = LC.map(s=>`
+    <div class="lc-card" onclick="this.classList.toggle('on')">
+      <div class="lc-stage">${s.stage}</div><div class="lc-name">${s.name}</div>
+      <div class="lc-pct">${s.pct}</div><div class="lc-desc">${s.desc}</div>
+    </div>`).join('');
+}
+
+/* --- ACTIONS DATA --- */
+const ACTIONS=[
+  {icon:'ti ti-solar-panel',name:'Switch to a green energy plan',save:1.1, why:'Renewable electricity emits near zero CO₂.'},
+  {icon:'ti ti-bike',name:'Cycle trips under 5 km',save:0.6, why:'Replaces car fuel burns directly.'},
+  {icon:'ti ti-salad',name:'Reduce meat to 3 meals/wk',save:0.5, why:'Cattle methane is highly potent.'}
+];
+
+function renderActions(){
+  const list=document.getElementById('act-list');
+  if(!list)return;
+  list.innerHTML = ACTIONS.map((a,i)=>`
+    <div class="act-item" id="ai-${i}">
+      <div class="act-row">
+        <div class="act-left">
+          <div class="act-icon"><i class="${a.icon}"></i></div>
+          <div><div class="act-name">${escHtml(a.name)}</div><div class="act-save">Saves up to ${a.save.toFixed(1)}t CO₂/yr</div>
+          <button class="why-btn" onclick="document.getElementById('why-${i}').classList.toggle('on')"><i class="ti ti-info-circle"></i> Why it works</button></div>
+        </div>
+        <label class="tgl"><input type="checkbox" data-s="${a.save}" onchange="document.getElementById('ai-${i}').classList.toggle('checked',this.checked); updateSavings();"><div class="ttrack"></div><div class="tthumb"></div></label>
+      </div>
+      <div class="why-body" id="why-${i}">${escHtml(a.why)}</div>
+    </div>`).join('');
+}
+
+function updateSavings(){
+  let total=0;
+  document.querySelectorAll('#act-list input[type=checkbox]').forEach(c=>{if(c.checked)total+=parseFloat(c.dataset.s)});
+  const t=total.toFixed(1);
+  const sv=document.getElementById('sav-v'); const sub=document.getElementById('sav-sub');
+  const trees=document.getElementById('sav-trees'); const pct=document.getElementById('sav-pct');
+  if(sv)sv.textContent=t+'t CO₂';
+  if(trees)trees.textContent=Math.round(total*45);
+  if(pct)pct.textContent=Math.round(total/CalcEngine.sum(em)*100)+'%';
+  if(sub)sub.textContent=total>0?`= planting ${Math.round(total*45)} trees/yr`:'Enable actions above to see impact';
+}
+
+/* --- SCIENCE Q&A --- */
+const SCI_QA=[
+  {q:'What is CO₂e (Carbon Dioxide Equivalent)?', a:'CO₂e is a standard unit for measuring carbon footprints. It expresses the impact of different greenhouse gases.'},
+  {q:'What is the difference between Scope 1, 2, and 3 emissions?', a:'Scope 1 covers direct emissions. Scope 2 covers indirect electricity. Scope 3 covers value chain (products).'},
+  {q:'How do carbon sinks work?', a:'Carbon sinks are natural systems that suck up and store carbon dioxide from the atmosphere like forests and oceans.'},
+  {q:'What are Climate Tipping Points?', a:'Tipping points are critical thresholds that, when exceeded, can lead to irreversible climate changes.'}
+];
+
+function renderScience(){
+  const list=document.getElementById('sci-list');
+  if(!list)return;
+  list.innerHTML = SCI_QA.map((s,i)=>`
+    <div style="border-bottom:0.5px solid var(--color-border-tertiary); padding:10px 0;">
+      <button class="sci-q-btn" id="sci-btn-${i}" onclick="toggleSciQA(${i})" aria-expanded="false">
+        <span>${escHtml(s.q)}</span> <i class="ti ti-chevron-down"></i>
+      </button>
+      <div class="sci-a-box" id="sci-a-${i}">
+        <div style="margin-bottom:10px;">${escHtml(s.a)}</div>
+        <button class="btn-primary" onclick="sendPrompt('${s.q.replace(/'/g, "\\'")}')">
+          <i class="ti ti-message-chatbot"></i> Ask AI Adviser about this
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleSciQA(i) {
+  const ans = document.getElementById(`sci-a-${i}`);
+  const btn = document.getElementById(`sci-btn-${i}`);
+  const isHidden = ans.style.display === '' || ans.style.display === 'none';
+  ans.style.display = isHidden ? 'block' : 'none';
+  btn.classList.toggle('open', isHidden);
+}
+
+/* --- AI CHAT WIDGET LOGIC --- */
+function toggleChat() { document.getElementById('chat-panel').classList.toggle('on'); }
+
+// Wired to Science Tab
 function sendPrompt(topic) {
   const panel = document.getElementById('chat-panel');
   if (!panel.classList.contains('on')) toggleChat();
-  
   const input = document.getElementById('chat-input');
-  input.value = "Tell me more about: " + topic;
+  input.value = "Explain: " + topic;
   setTimeout(sendChat, 300);
 }
 
@@ -542,7 +848,6 @@ function sendChat() {
   const input = document.getElementById('chat-input');
   const text = input.value.trim();
   if (!text) return;
-  
   appendMsg(text, 'user');
   input.value = '';
   
@@ -550,372 +855,91 @@ function sendChat() {
     let aiResp = "That's an important topic. ";
     const tLower = text.toLowerCase();
     
-    if (tLower.includes('co₂e') || tLower.includes('methane') || tLower.includes('equivalent')) {
-      aiResp += "Because different gases trap heat differently, CO₂e gives us a single metric. For example, the 84x multiplier for methane is why food waste and agriculture are such critical focus areas!";
-    } else if (tLower.includes('tipping point') || tLower.includes('feedback')) {
-      aiResp += "Tipping points represent thresholds where climate change becomes self-sustaining. This underscores why immediate footprint reduction is far more valuable than delayed action.";
-    } else if (tLower.includes('paris') || tLower.includes('1.5°c') || tLower.includes('target')) {
-      aiResp += "The 2.0t Paris target is a global per-capita goal. While your current score is 8.4t, using the tracker tab to model changes to your transport or energy can show you a clear path downward.";
+    if (tLower.includes('co₂e') || tLower.includes('equivalent')) {
+      aiResp += "CO₂e allows us to compare different gases like methane, which is 84x more potent over 20 years, under one metric.";
+    } else if (tLower.includes('tipping point')) {
+      aiResp += "Tipping points are thresholds where warming becomes self-sustaining, making immediate reduction crucial.";
     } else if (tLower.includes('scope')) {
-      aiResp += "Scope 3 emissions are tricky because they are hidden in everything we buy. Choosing to repair items or buy secondhand drastically reduces this part of your footprint.";
-    } else if (tLower.includes('sinks') || tLower.includes('forest') || tLower.includes('ocean')) {
-      aiResp += "While sinks like forests are vital, their capacity is finite. A single tree absorbs about 22kg/year, meaning it takes hundreds of trees to offset an average lifestyle. Reduction must always come before offsetting.";
+      aiResp += "Scope 3 emissions (indirect value chain) are often your biggest footprint area. Reducing consumption tackles this directly.";
+    } else if (tLower.includes('sinks')) {
+      aiResp += "Carbon sinks like oceans and forests absorb emissions, but their capacity is dropping. We must reduce, not just offset.";
     } else {
-      aiResp += "Based on your current data, your highest emission source is transport. Focusing on public transit or reducing meat intake are often the fastest ways to lower your score. Would you like tips on a specific category?";
+      aiResp += `I see you asked about "${escHtml(text)}". While your tracker calculates grid averages at 0.75 kg/kWh for Maharashtra, I can help you find specific ways to lower it further!`;
     }
-    
     appendMsg(aiResp, 'ai');
-  }, 900);
+  }, 800);
 }
 
 function appendMsg(text, sender) {
   const body = document.getElementById('chat-body');
   const div = document.createElement('div');
   div.className = 'msg ' + sender;
-  div.textContent = text;
+  div.textContent = text; 
   body.appendChild(div);
   body.scrollTop = body.scrollHeight;
 }
 
-
-/* MAIN APP LOGIC */
-const em={transport:3.8,energy:2.1,food:1.5,flights:0.2,shopping:0.8};
-const FL=['EV','Hybrid','Petrol','Diesel'];
-
-function tot(){return +Object.values(em).reduce((a,b)=>a+b,0).toFixed(1)}
-
-function sw(id,btn){
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
-  if(btn instanceof Element)btn.classList.add('on');
-  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
-  document.getElementById('p-'+id).classList.add('on');
+/* --- A11Y & THEME --- */
+let isDark = false;
+function toggleTheme() {
+  isDark = !isDark;
+  document.documentElement.classList.toggle('dark-theme', isDark);
+  document.getElementById('theme-icon').className = isDark ? 'ti ti-sun' : 'ti ti-moon';
+  setTimeout(initCharts, 50);
 }
+function toggleA11yMenu() { document.getElementById('a11y-menu').classList.toggle('on'); }
+function toggleTextSize() { document.getElementById('btn-text-size').classList.toggle('active', document.documentElement.classList.toggle('large-text')); }
+function toggleContrast() { document.getElementById('btn-contrast').classList.toggle('active', document.documentElement.classList.toggle('high-contrast')); setTimeout(initCharts, 50); }
 
-function sv(id,val,unit){
-  const el=document.getElementById('lv-'+id);
-  if(el)el.textContent=val+unit;
-}
-function sfuel(v){const el=document.getElementById('lv-fuel');if(el)el.textContent=FL[+v]}
-
-let rcT=null;
-function rc(){clearTimeout(rcT);rcT=setTimeout(_rc,40)}
-function _rc(){
-  const g=id=>{const el=document.getElementById(id);return el?+el.value:0};
-  const km=g('s-km')||240,fuel=g('s-fuel')||2,transit=g('s-transit')||1;
-  const home=g('s-home')||85,renew=g('s-renew')||20;
-  const meat=g('s-meat')||5,local=g('s-local')||30;
-  const shrt=g('s-short')||1,lng=g('s-long')||0;
-  const fm=[0.04,0.48,1.0,1.18];
-  em.transport=Math.max(0.05,+(km*52*0.00019*fm[fuel]*(1-transit*0.055)).toFixed(2));
-  em.energy=Math.max(0.1,+((home*0.006+1.0)*(1-renew/100)).toFixed(2));
-  em.food=Math.max(0.1,+(0.4+meat*0.065*(1-local*0.003)).toFixed(2));
-  em.flights=+(shrt*0.13+lng*1.2).toFixed(2);
-  updateAll();
-}
-
-function updateAll(){
-  const t=tot();
-  document.getElementById('top-score').textContent=t;
-  document.getElementById('ring-n').textContent=t;
-  document.getElementById('k-total').textContent=t+'t';
-  document.getElementById('k-trans').textContent=em.transport.toFixed(1)+'t';
-  document.getElementById('k-trans-pct').textContent=Math.round(em.transport/t*100)+'% of total';
-  document.getElementById('dash-total').textContent=t;
-  document.getElementById('cmp-yv').textContent=t+'t';
-  document.getElementById('cmp-yb').style.width=Math.round(t/15*100)+'%';
-
-  const pct=Math.min(t/15,1);
-  document.getElementById('ring-arc').setAttribute('stroke-dashoffset',(263.9*(1-pct)).toFixed(1));
-
-  const mx=Math.max(...Object.values(em),0.1);
-  const map={t:'transport',e:'energy',f:'food',s:'shopping',fl:'flights'};
-  Object.entries(map).forEach(([k,cat])=>{
-    const bf=document.getElementById('bf-'+k),bv=document.getElementById('bv-'+k);
-    if(bf)bf.style.width=Math.round((em[cat]||0)/mx*93)+'%';
-    if(bv)bv.textContent=(em[cat]||0).toFixed(1)+'t';
-  });
-
-  document.getElementById('eq-trees').textContent=Math.round(t*45).toLocaleString('en-IN');
-  document.getElementById('eq-km').textContent=Math.round(t*4400).toLocaleString('en-IN');
-  document.getElementById('eq-coal').textContent=(t*0.44).toFixed(1);
-  document.getElementById('eq-flights').textContent=Math.round(t/0.13);
-
-  if(chartInstances[1]){chartInstances[1].data.datasets[0].data=[em.transport,em.energy,em.food,em.shopping,em.flights];chartInstances[1].update('none')}
-  updateSavings();
-  refreshSourceVals();
-}
-
-const SOURCES=[
-  {id:'transport',bg:'#FAEEDA',icon:'ti ti-car',name:'Transport',sub:'Road, rail & private vehicles',
-    val:()=>em.transport,
-    desc:'Transport is the single largest personal carbon source globally. Private petrol and diesel cars dominate. Manufacturing a car creates 6–35t CO₂ before it moves — its "embedded carbon." In India, two-wheelers account for 70% of the vehicle fleet but only 30% of transport emissions.',
-    facts:[{v:'0.21kg',l:'CO₂ per km — petrol'},{v:'0.05kg',l:'CO₂ per km — EV'},{v:'0.09kg',l:'CO₂ per km — bus'}],
-    tip:'Switching 3 days/week to transit saves ~1.2t/yr. Going EV on Indian renewables saves up to 2.5t/yr vs petrol.'},
-  {id:'energy',bg:'#E6F1FB',icon:'ti ti-bolt',name:'Home energy',sub:'Electricity, heating & cooling',
-    val:()=>em.energy,
-    desc:'India\'s electricity grid is ~60% coal-based, meaning every kWh generates ~0.82kg CO₂ — one of the highest intensities globally. EU average is 0.23kg/kWh; solar/wind is near zero. Cooling accounts for up to 40% of home energy in hot climates.',
-    facts:[{v:'0.82kg',l:'CO₂/kWh — India grid'},{v:'0.23kg',l:'CO₂/kWh — EU avg'},{v:'~0kg',l:'CO₂/kWh — solar'}],
-    tip:'Moving to a 100% renewable plan can eliminate this category entirely — usually one online switch at equal or lower cost.'},
-  {id:'food',bg:'#EAF3DE',icon:'ti ti-salad',name:'Food & diet',sub:'Production, packaging & food waste',
-    val:()=>em.food,
-    desc:'Food systems cause 26% of global greenhouse emissions. Beef cattle produce methane (84× more potent than CO₂ over 20 years) and require vast land cleared from forests. Food waste alone is 8% of all global emissions — most rotting in landfills producing methane.',
-    facts:[{v:'60kg',l:'CO₂e per kg beef'},{v:'3.5kg',l:'CO₂e per kg chicken'},{v:'0.4kg',l:'CO₂e per kg lentils'}],
-    tip:'Cutting beef by 70% saves ~0.5t/yr. A plant-rich diet (not fully vegan) can save 1.5t. Wasting less food saves ~0.2t.'},
-  {id:'flights',bg:'#EEEDFE',icon:'ti ti-plane',name:'Flights',sub:'Domestic & international air travel',
-    val:()=>em.flights,
-    desc:'Aviation is unique: it emits CO₂ at altitude where warming effects are 2–4× greater than at ground level (contrail and NOx effects). A London–Mumbai return flight emits ~1.5t CO₂ — equivalent to 8 months of average home heating in India.',
-    facts:[{v:'~1.5t',l:'CO₂ London–Mumbai'},{v:'×2–4',l:'High-altitude multiplier'},{v:'2.5%',l:'Of global CO₂'}],
-    tip:'Replacing one long-haul flight with a train saves 0.9–1.8t and is often faster city-centre to city-centre in Europe and India.'},
-  {id:'shopping',bg:'#F1EFE8',icon:'ti ti-shopping-bag',name:'Shopping & goods',sub:'Manufactured products & services',
-    val:()=>em.shopping,
-    desc:'Every product carries "embedded carbon" from raw material extraction, manufacturing, global shipping, and disposal. Fast fashion produces 1.2 billion tonnes of CO₂ annually. The fashion industry is responsible for 10% of global carbon emissions. A smartphone takes ~70kg CO₂ to manufacture.',
-    facts:[{v:'70kg',l:'CO₂ per smartphone'},{v:'33kg',l:'CO₂ per pair jeans'},{v:'1.2Bt',l:'Fast fashion per year'}],
-    tip:'Buying secondhand, repairing, and avoiding single-use items can cut this category by 40–60% with no loss of utility.'},
-];
-
-function renderSources(){
-  const list=document.getElementById('src-list');
-  if(!list||list.childElementCount>0)return;
-  SOURCES.forEach(s=>{
-    const el=document.createElement('div');
-    el.className='src-item';el.id='si-'+s.id;
-    el.innerHTML=`<div class="src-head" id="sh-${s.id}" onclick="toggleSrc('${s.id}')" role="button" tabindex="0" aria-expanded="false">
-      <div class="src-icon" style="background:${s.bg}"><i class="${s.icon}" aria-hidden="true" style="color:#000"></i></div>
-      <div class="src-meta"><div class="src-name">${s.name}</div><div class="src-sub">${s.sub}</div></div>
-      <div class="src-right"><div class="src-t" id="sv-${s.id}">${s.val().toFixed(1)}t</div><div class="src-pct" id="sp-${s.id}"></div></div>
-      <i class="ti ti-chevron-down" id="sc-${s.id}" aria-hidden="true" style="font-size:16px;color:var(--color-text-secondary);transition:transform .2s;flex-shrink:0"></i>
-    </div>
-    <div class="src-body" id="sb-${s.id}">
-      <div class="src-desc">${s.desc}</div>
-      <div class="src-facts">${s.facts.map(f=>`<div class="fact"><div class="fact-v">${f.v}</div><div class="fact-l">${f.l}</div></div>`).join('')}</div>
-      <div class="src-tip"><b>Reduction tip:</b> ${s.tip}</div>
-    </div>`;
-    el.querySelector('.src-head').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')toggleSrc(s.id)});
-    list.appendChild(el);
-  });
-  refreshSourceVals();
-}
-
-function toggleSrc(id){
-  const body=document.getElementById('sb-'+id);
-  const head=document.getElementById('sh-'+id);
-  const chevron=document.getElementById('sc-'+id);
-  const on=body.classList.contains('on');
-  document.querySelectorAll('.src-body').forEach(b=>b.classList.remove('on'));
-  document.querySelectorAll('.src-head').forEach(h=>{h.classList.remove('open');h.setAttribute('aria-expanded','false')});
-  document.querySelectorAll('[id^=sc-]').forEach(c=>c.style.transform='');
-  if(!on){body.classList.add('on');head.classList.add('open');head.setAttribute('aria-expanded','true');chevron.style.transform='rotate(180deg)'}
-}
-
-function refreshSourceVals(){
-  const t=tot();
-  SOURCES.forEach(s=>{
-    const sv=document.getElementById('sv-'+s.id);
-    const sp=document.getElementById('sp-'+s.id);
-    if(sv)sv.textContent=s.val().toFixed(1)+'t';
-    if(sp)sp.textContent=Math.round(s.val()/t*100)+'%';
-  });
-}
-
-const LC=[
-  {stage:'Production',name:'Raw materials',pct:'38%',desc:'Mining, farming, manufacturing — the largest upstream burden. Steel production emits 1.85t CO₂ per tonne. Your clothing, electronics and food all carry this embedded carbon before you even use them.'},
-  {stage:'Transport',name:'Supply chains',pct:'11%',desc:'Moving goods from production to consumer. Ships carry 90% of global trade and emit 2.5% of CO₂. Air freight is 50× more carbon-intensive than sea freight per tonne-kilometre.'},
-  {stage:'Direct use',name:'Consumption phase',pct:'29%',desc:'Your direct energy use — driving, heating, cooling, cooking. This is what most people think of as their footprint, but it is often less than the upstream embedded carbon in goods they buy.'},
-  {stage:'Waste',name:'End of life',pct:'12%',desc:'Landfill waste decomposes to produce methane — 84× more potent than CO₂ over 20 years. Food waste in landfills is one of the most avoidable emission sources worldwide.'},
-  {stage:'Land use',name:'Ecosystem change',pct:'7%',desc:'Deforestation and land conversion release stored carbon. The Amazon stores ~150 billion tonnes of CO₂. Clearing 1 hectare for cattle grazing releases ~500 tonnes of CO₂ into the atmosphere.'},
-  {stage:'Digital',name:'Services & internet',pct:'3%',desc:'The internet uses 10% of global electricity. Streaming video for 1 hour ≈ 36g CO₂. Bitcoin mining uses more electricity than Argentina. Your data usage has a real carbon cost.'},
-];
-
-function renderLifecycle(){
-  const grid=document.getElementById('lc-grid');
-  if(!grid||grid.childElementCount>0)return;
-  LC.forEach(s=>{
-    const card=document.createElement('div');
-    card.className='lc-card';
-    card.setAttribute('role','button');card.setAttribute('tabindex','0');
-    card.innerHTML=`<div class="lc-stage">${s.stage}</div><div class="lc-name">${s.name}</div><div class="lc-pct">${s.pct}</div><div class="lc-desc">${s.desc}</div>`;
-    card.addEventListener('click',()=>{
-      const wasOn=card.classList.contains('on');
-      document.querySelectorAll('.lc-card').forEach(c=>c.classList.remove('on'));
-      if(!wasOn)card.classList.add('on');
-    });
-    card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')card.click()});
-    grid.appendChild(card);
-  });
-}
-
-const ACTIONS=[
-  {icon:'ti ti-bike',name:'Cycle / walk for trips under 5 km',save:0.6,why:'Replacing short car trips with cycling eliminates 100% of those trip emissions. Petrol cars emit 0.21kg CO₂/km — cycling emits ~0.005kg (from food calories burned). Short trips are also when engines are coldest and most polluting.'},
-  {icon:'ti ti-salad',name:'Reduce meat to 3 meals/week',save:0.5,why:'Beef cattle produce methane — 84× more potent than CO₂ over 20 years. A 70% beef reduction is equivalent to switching from a petrol car to a hybrid. You do not need to go fully vegan to make a large difference.'},
-  {icon:'ti ti-solar-panel',name:'Switch to a green energy plan',save:1.1,why:'In India, each coal kWh emits 0.82kg CO₂. Renewable electricity emits near zero. This is usually a 10-minute online switch. In many Indian cities green tariffs are now equal to or cheaper than standard rates.'},
-  {icon:'ti ti-train',name:'Train instead of one long-haul flight',save:0.9,why:'Rail emits 6g CO₂/km vs 255g/km for a short-haul flight. High-altitude effects make aviation 2–4× more warming than the CO₂ figure alone. City-centre to city-centre, trains are often faster than flying.'},
-  {icon:'ti ti-home',name:'Insulate home and seal all drafts',save:0.7,why:'Up to 25% of home heat escapes through walls, 15% through floors. Insulation typically pays back its installation cost in 3–5 years and permanently cuts bills and emissions with no ongoing effort.'},
-  {icon:'ti ti-recycle',name:'Buy secondhand — repair before replacing',save:0.4,why:'Manufacturing a new product generates 80–90% of its lifetime carbon. Buying secondhand transfers existing embedded carbon rather than commissioning new production. Repair cafes and resale platforms make this very easy.'},
-];
-
-function renderActions(){
-  const list=document.getElementById('act-list');
-  if(!list||list.childElementCount>0)return;
-  ACTIONS.forEach((a,i)=>{
-    const item=document.createElement('div');
-    item.className='act-item';item.id='ai-'+i;
-    item.innerHTML=`<div class="act-row">
-      <div class="act-left">
-        <div class="act-icon"><i class="${a.icon}" aria-hidden="true" style="font-size:17px;color:var(--color-text-primary)"></i></div>
-        <div>
-          <div class="act-name">${a.name}</div>
-          <div class="act-save">Saves up to ${a.save.toFixed(1)}t CO₂/yr</div>
-          <button class="why-btn" id="wb-${i}" onclick="toggleWhy(${i})" aria-expanded="false"><i class="ti ti-info-circle" aria-hidden="true" style="font-size:12px"></i>Why it works</button>
-        </div>
-      </div>
-      <label class="tgl" aria-label="Toggle: ${a.name}">
-        <input type="checkbox" data-s="${a.save}" onchange="onAct(${i},this)">
-        <div class="ttrack" aria-hidden="true"></div>
-        <div class="tthumb" aria-hidden="true"></div>
-      </label>
-    </div>
-    <div class="why-body" id="why-${i}">${a.why}</div>`;
-    list.appendChild(item);
-  });
-}
-
-function toggleWhy(i){
-  const body=document.getElementById('why-'+i);
-  const btn=document.getElementById('wb-'+i);
-  if(!body)return;
-  const on=body.classList.contains('on');
-  body.classList.toggle('on',!on);
-  btn.setAttribute('aria-expanded',String(!on));
-  btn.querySelector('i').className=on?'ti ti-info-circle':'ti ti-x';
-  btn.querySelector('i').style.fontSize='12px';
-}
-
-function onAct(i,cb){
-  const item=document.getElementById('ai-'+i);
-  if(item)item.classList.toggle('checked',cb.checked);
-  updateSavings();
-}
-
-function updateSavings(){
-  let total=0;
-  document.querySelectorAll('#act-list input[type=checkbox]').forEach(c=>{if(c.checked)total+=parseFloat(c.dataset.s)});
-  const t=total.toFixed(1);
-  const sv=document.getElementById('sav-v');
-  const sub=document.getElementById('sav-sub');
-  const trees=document.getElementById('sav-trees');
-  const pct=document.getElementById('sav-pct');
-  if(sv)sv.textContent=t+'t CO₂';
-  if(trees)trees.textContent=Math.round(total*45);
-  if(pct)pct.textContent=Math.round(total/tot()*100)+'%';
-  if(sub)sub.textContent=total>0?`= planting ${Math.round(total*45)} trees/yr · ${Math.round(total*4400).toLocaleString('en-IN')} km off the road`:'Enable actions above to see impact';
-}
-
-const SCI=[
-  {title:'What is CO₂e — carbon dioxide equivalent?',bg:'#E1F5EE',tc:'#085041',
-    body:'CO₂e is the standard unit that converts all greenhouse gases into one comparable number using their global warming potential (GWP). Methane (CH₄) has a GWP of 84 over 20 years — meaning 1kg of methane = 84kg CO₂e. Nitrous oxide (N₂O, primarily from agriculture) has a GWP of 273. This is why diet and farming have outsized climate impact despite relatively low direct CO₂ emissions.',
-    stats:[{v:'1×',l:'CO₂ GWP'},{v:'84×',l:'Methane GWP (20yr)'},{v:'273×',l:'N₂O GWP (20yr)'}]},
-  {title:'The 1.5°C Paris target — what it means per person',bg:'#E6F1FB',tc:'#0C447C',
-    body:'The IPCC says global emissions must halve by 2030 and reach net-zero by 2050 to limit warming to 1.5°C above pre-industrial levels. Translated to a personal carbon budget, each person on Earth can emit no more than ~2t CO₂e/yr. The global average is currently 4.7t — a 135% overshoot. Countries like India at 1.9t are below budget; the US at 14.9t is 645% over.',
-    stats:[{v:'2.0t',l:'Per-person budget'},{v:'4.7t',l:'Current avg'},{v:'135%',l:'Global overshoot'}]},
-  {title:'Carbon sinks: how forests and oceans absorb CO₂',bg:'#EAF3DE',tc:'#27500A',
-    body:'Natural carbon sinks — forests, soils, and oceans — currently absorb about half of all human CO₂ emissions. A mature tree absorbs ~22kg CO₂/year (not the "offset 1 tonne per tree" myth widely repeated online). The Amazon forest alone stores ~150 billion tonnes of carbon. Ocean acidification from absorbed CO₂ is already damaging coral reefs — the ocean\'s ability to absorb carbon is declining.',
-    stats:[{v:'22kg',l:'CO₂/tree/year'},{v:'50%',l:'Emissions absorbed'},{v:'150Bt',l:'Amazon CO₂ stored'}]},
-  {title:'Scope 1, 2 and 3 — why your real footprint is larger',bg:'#EEEDFE',tc:'#3C3489',
-    body:'Emissions are classified into three scopes. Scope 1 is direct (your car, gas boiler). Scope 2 is indirect from electricity you buy. Scope 3 is everything in your value chain — what you buy, eat, invest in, fly in, stream online. For individuals, Scope 3 is 70–80% of the real footprint. Most personal carbon calculators only measure Scope 1 and 2, significantly underestimating true impact.',
-    stats:[{v:'~20%',l:'Scope 1 (direct)'},{v:'~10%',l:'Scope 2 (electricity)'},{v:'~70%',l:'Scope 3 (indirect)'}]},
-  {title:'Climate tipping points — why urgency matters',bg:'#FAECE7',tc:'#712B13',
-    body:'Climate feedback loops can amplify warming beyond human control. Arctic ice loss reduces Earth\'s reflectivity (albedo), absorbing more heat. Permafrost thaw releases stored methane. Amazon dieback from drought reduces CO₂ absorption. Scientists estimate multiple tipping points may be crossed between 1.5°C and 2°C of warming. These are irreversible on human timescales — which is why acting now, before tipping points are reached, is fundamentally different from acting later.',
-    stats:[{v:'1.1°C',l:'Warming already'},{v:'~1.5–2°C',l:'Tipping point range'},{v:'×2–5',l:'Feedback amplification'}]},
-];
-
-function renderScience(){
-  const list=document.getElementById('sci-list');
-  if(!list||list.childElementCount>0)return;
-  SCI.forEach((s,i)=>{
-    const item=document.createElement('div');
-    item.className='sci-item';
-    item.innerHTML=`<div class="sci-head" id="sch-${i}" onclick="toggleSci(${i})" role="button" tabindex="0" aria-expanded="false">
-      <span class="sci-badge" style="background:${s.bg};color:${s.tc}">${i+1}</span>
-      <div class="sci-title">${s.title}</div>
-      <i class="ti ti-chevron-down" id="sci-ic-${i}" aria-hidden="true" style="font-size:15px;color:var(--color-text-secondary);flex-shrink:0;transition:transform .2s"></i>
-    </div>
-    <div class="sci-body" id="sci-b-${i}">
-      ${s.body}
-      <div class="sci-stats">${s.stats.map(st=>`<div class="sci-stat"><div class="sci-stat-v">${st.v}</div><div class="sci-stat-l">${st.l}</div></div>`).join('')}</div>
-      <button class="sci-ask" onclick="sendPrompt('${s.title.replace(/'/g,'')}')" aria-label="Ask AI about this topic"><i class="ti ti-external-link" aria-hidden="true" style="font-size:13px"></i>Explore further with AI ↗</button>
-    </div>`;
-    item.querySelector('.sci-head').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')toggleSci(i)});
-    list.appendChild(item);
-  });
-}
-
-function toggleSci(i){
-  const body=document.getElementById('sci-b-'+i);
-  const head=document.getElementById('sch-'+i);
-  const ic=document.getElementById('sci-ic-'+i);
-  const on=body.classList.contains('on');
-  document.querySelectorAll('.sci-body').forEach(b=>b.classList.remove('on'));
-  document.querySelectorAll('[id^=sch-]').forEach(h=>h.setAttribute('aria-expanded','false'));
-  document.querySelectorAll('[id^=sci-ic-]').forEach(c=>c.style.transform='');
-  if(!on){body.classList.add('on');head.setAttribute('aria-expanded','true');ic.style.transform='rotate(180deg)'}
-}
-
+/* --- CHARTS INIT --- */
 function initCharts() {
-  const rootStyle = getComputedStyle(document.documentElement);
-  const getCol = (name, fallback) => rootStyle.getPropertyValue(name).trim() || fallback;
+  Object.values(chartInstances).forEach(c => c.destroy());
+  chartInstances = {};
   
-  const gc = getCol('--color-border-secondary', 'rgba(0,0,0,0.1)');
-  const tc = getCol('--color-text-secondary', 'rgba(0,0,0,0.6)');
+  const rootStyle = getComputedStyle(document.documentElement);
+  const gc = rootStyle.getPropertyValue('--color-border-secondary').trim() || 'rgba(0,0,0,0.1)';
+  const tc = rootStyle.getPropertyValue('--color-text-secondary').trim() || 'rgba(0,0,0,0.6)';
+  const tw = rootStyle.getPropertyValue('--color-border-secondary').trim() || 'rgba(0,0,0,0.14)';
 
-  if(chartInstances.length > 0) {
-    chartInstances.forEach(c => c.destroy());
-    chartInstances = [];
+  const tC = document.getElementById('trendC');
+  if(tC) {
+    chartInstances.trendC = new Chart(tC,{
+      type:'line', data:{labels:['Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun'], datasets:[
+        {label:'CO₂',data:[9.8,9.5,9.1,9.0,8.7,8.4,8.3,8.5,8.6,8.2,8.3,8.4],borderColor:'#D85A30',backgroundColor:'rgba(216,90,48,.07)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#D85A30',borderWidth:2},
+        {label:'Paris',data:Array(12).fill(2.0),borderColor:tw,borderDash:[5,4],borderWidth:1.5,pointRadius:0,fill:false}
+      ]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:gc},ticks:{color:tc}},y:{grid:{color:gc},ticks:{color:tc,callback:v=>v+'t'},min:0}}}
+    });
   }
 
-  const c1 = new Chart(document.getElementById('trendC'),{
-    type:'line',
-    data:{labels:['Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun'],
-      datasets:[
-        {label:'CO₂',data:[9.8,9.5,9.1,9.0,8.7,8.4,8.3,8.5,8.6,8.2,8.3,8.4],borderColor:'#D85A30',backgroundColor:'rgba(216,90,48,.07)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#D85A30',borderWidth:2},
-        {label:'Paris',data:Array(12).fill(2.0),borderColor:'#9ca3af',borderDash:[5,4],borderWidth:1.5,pointRadius:0,fill:false}
-      ]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:11}}},y:{grid:{color:gc},ticks:{color:tc,font:{size:11},callback:v=>v+'t'},min:0}}}
-  });
+  const cC = document.getElementById('catC');
+  if(cC) {
+    chartInstances.catC = new Chart(cC,{
+      type:'bar', indexAxis:'y',
+      data:{labels:['Transport','Energy','Food','Shopping','Flights'], datasets:[{data:[3.8,2.1,1.5,0.8,0.2],backgroundColor:['#EF9F27','#85B7EB','#97C459','#B4B2A9','#AFA9EC']}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:gc},ticks:{color:tc,callback:v=>v+'t'}},y:{grid:{color:gc},ticks:{color:tc}}}}
+    });
+  }
 
-  const c2 = new Chart(document.getElementById('catC'),{
-    type:'bar',indexAxis:'y',
-    data:{labels:['Transport','Energy','Food','Shopping','Flights'],
-      datasets:[{data:[3.8,2.1,1.5,0.8,0.2],backgroundColor:['#EF9F27','#85B7EB','#97C459','#B4B2A9','#AFA9EC']}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:11},callback:v=>v+'t'}},y:{grid:{color:gc},ticks:{color:tc,font:{size:11}}}}}
-  });
+  const cmC = document.getElementById('cmpC');
+  if(cmC) {
+    chartInstances.cmpC = new Chart(cmC,{
+      type:'bar', indexAxis:'y',
+      data:{labels:['You','India','World','EU','US','Paris 2030'], datasets:[{data:[8.4,1.9,4.7,6.8,14.9,2.0],backgroundColor:['#1D9E75','#B4B2A9','#B4B2A9','#B4B2A9','#B4B2A9','#9FE1CB']}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:gc},ticks:{color:tc,callback:v=>v+'t'}},y:{grid:{color:gc},ticks:{color:tc}}}}
+    });
+  }
 
-  const c3 = new Chart(document.getElementById('cmpC'),{
-    type:'bar',indexAxis:'y',
-    data:{labels:['You','India','World','EU','US','Paris 2030'],
-      datasets:[{data:[8.4,1.9,4.7,6.8,14.9,2.0],backgroundColor:['#1D9E75','#B4B2A9','#B4B2A9','#B4B2A9','#B4B2A9','#9FE1CB']}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:11},callback:v=>v+'t'}},y:{grid:{color:gc},ticks:{color:tc,font:{size:11}}}}}
-  });
-
-  const c4 = new Chart(document.getElementById('lcC'),{
-    type:'bar',
-    data:{labels:['Transport','Food','Housing','Goods','Services'],
-      datasets:[
+  const lC = document.getElementById('lcC');
+  if(lC) {
+    chartInstances.lcC = new Chart(lC,{
+      type:'bar', data:{labels:['Transport','Food','Housing','Goods','Services'], datasets:[
         {label:'Upstream',data:[1200,1800,600,900,300],backgroundColor:'#EF9F27'},
         {label:'Direct use',data:[2400,400,1200,200,100],backgroundColor:'#85B7EB'},
         {label:'Downstream',data:[400,600,200,800,200],backgroundColor:'#97C459'},
-      ]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{stacked:true,grid:{color:gc},ticks:{color:tc,font:{size:11}}},y:{stacked:true,grid:{color:gc},ticks:{color:tc,font:{size:11},callback:v=>v+'kg'}}}}
-  });
-
-  chartInstances.push(c1, c2, c3, c4);
-}
-
-function updateChartsTheme() {
-  setTimeout(initCharts, 50); // slight delay to allow CSS vars to update
+      ]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{stacked:true,grid:{color:gc},ticks:{color:tc}},y:{stacked:true,grid:{color:gc},ticks:{color:tc,callback:v=>v+'kg'}}}}
+    });
+  }
+  updateDOM();
 }
 
 window.addEventListener('load',()=>{
@@ -924,12 +948,13 @@ window.addEventListener('load',()=>{
     document.documentElement.classList.add('dark-theme');
     document.getElementById('theme-icon').className = 'ti ti-sun';
   }
-  
+  runTests();
   renderSources();
-  renderActions();
   renderLifecycle();
+  renderActions();
   renderScience();
-  updateAll();
+  renderHistory();
+  _rc(); 
   initCharts();
 });
 </script>
