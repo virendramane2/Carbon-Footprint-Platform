@@ -51,11 +51,15 @@ Every small action contributes to a greener future.
 
 This platform provides educational estimates only. Actual emissions may vary depending on lifestyle, region, and data sources.
 
-📜 Data Sources
+## 📜 Data Sources
 IPCC AR6 (2021)- Emission factors & climate targets
+
 IEA Global Energy Review- Electricity grid emission intensities
+
 Our World in Data- Per-capita national averages
+
 Project Drawdown- Reduction action potentials
+
 CEA India- Indian grid emission factor (0.82 kg CO₂/kWh)
 
 ## 👨‍💻 Author
