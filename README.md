@@ -70,7 +70,7 @@ Developed as a climate awareness and sustainability project.
 
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-<div class="github-bg-icon"></div>
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 
 <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo" width="50" height="50">
 
