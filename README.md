@@ -67,6 +67,7 @@ CEA India- Indian grid emission factor (0.82 kg CO₂/kWh)
 Developed as a climate awareness and sustainability project.
 
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
+https://img.icons8.com/?size=100&id=20909&format=png&color=000000
 <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo" width="50" height="50">
 
 
