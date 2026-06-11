@@ -65,3 +65,5 @@ CEA India- Indian grid emission factor (0.82 kg CO₂/kWh)
 ## 👨‍💻 Author
 
 Developed as a climate awareness and sustainability project.
+
+MIT License — free to use, modify, and distribute with attribution.
