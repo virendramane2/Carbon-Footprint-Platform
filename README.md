@@ -70,24 +70,12 @@ Developed as a climate awareness and sustainability project.
 
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
- <img 
+<img 
   src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" 
   alt="GitHub Logo" 
   width="32" 
   height="32"
 >
-/* Style the SVG size and default color */
-.github-logo {
-  width: 32px;
-  height: 32px;
-  fill: #24292f; /* Standard GitHub dark gray */
-  transition: fill 0.3s ease;
-}
-
-/* Add a hover effect */
-.github-logo:hover {
-  fill: #0969da; /* Changes to GitHub's link blue on hover */
-}
 
 <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo" width="50" height="50">
 
